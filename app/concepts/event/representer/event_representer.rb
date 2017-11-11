@@ -4,10 +4,11 @@ class Event::Representer::EventRepresenter < Representable::Decorator
 
   include Representable::JSON
 
-  property :uuid, as: :id
+  property :uri
   property :title
   property :start
   property :end
-  # collection :composer_ids
+  property :location
+  property :description
 
 end

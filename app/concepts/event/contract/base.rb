@@ -5,5 +5,7 @@ class Event::Contract::Base < Reform::Form
   property :title
   property :start
   property :end
+  property :location
+  property :description
 
 end

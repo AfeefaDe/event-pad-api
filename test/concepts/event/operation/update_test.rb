@@ -3,12 +3,11 @@ require 'test_helper'
 class Event::Operation::UpdateTest < ActiveSupport::TestCase
 
   test 'should update event' do
-    Event::Operation::Create.(title: 'title123', start: Time.current + 1.hour, end: Time.current + 2.hour)
+    Event::Operation::Create.(title: 'title123', start: Time.current + 1.hour, location: 'irgendwo')
     event = Event.last
     assert_no_difference -> { Event.count } do
       result =
-        Event::Operation::Update.(id: event.uuid,
-          title: 'foo', start: Time.current + 1.hour, end: Time.current + 2.hour)
+        Event::Operation::Update.(uri: event.uri, title: 'foo')
       assert result.success?
       event.reload
       assert_equal event, result['model']

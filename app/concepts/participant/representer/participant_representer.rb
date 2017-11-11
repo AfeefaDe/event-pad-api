@@ -1,6 +1,6 @@
 require 'representable/json'
 
-class Member::Representer::MemberRepresenter < Representable::Decorator
+class Participant::Representer::ParticipantRepresenter < Representable::Decorator
 
   include Representable::JSON
 

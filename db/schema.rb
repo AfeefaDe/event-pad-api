@@ -10,31 +10,36 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171111040614) do
+ActiveRecord::Schema.define(version: 20171111033406) do
 
   create_table "events", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "title", null: false
     t.datetime "start", null: false
-    t.datetime "end", null: false
+    t.datetime "end"
+    t.string "host"
+    t.string "location", null: false
+    t.text "description"
+    t.string "initiator_name"
+    t.string "uri", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "uuid", null: false
-  end
-
-  create_table "members", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.string "name", null: false
-    t.bigint "event_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["event_id"], name: "index_members_on_event_id"
   end
 
   create_table "messages", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.text "content"
-    t.bigint "member_id"
+    t.string "author_name", null: false
+    t.text "content", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["member_id"], name: "index_messages_on_member_id"
+  end
+
+  create_table "participants", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string "name", null: false
+    t.string "email"
+    t.integer "rsvp", null: false
+    t.bigint "event_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["event_id"], name: "index_participants_on_event_id"
   end
 
 end

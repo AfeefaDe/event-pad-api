@@ -6,16 +6,16 @@ class Event::Operation::Create < Trailblazer::Operation
   step Contract::Build(constant: Event::Contract::Base)
   step Contract::Validate()
   # failure :log_error!
-  step :generate_uuid!
+  step :generate_unique_uri!
   step Contract::Persist()
 
-  def model!(options, params:)
+  def model!(options)
     options['model'] = Event.new
   end
 
-  def generate_uuid!(options)
+  def generate_unique_uri!(options, params:, **)
     # TODO: Generate UUID
-    options['model'].uuid = SecureRandom.uuid
+    options['model'].uri = SecureRandom.uuid[0..8] + params[:title].downcase.strip.gsub(' ', '-').gsub(/[^\w-]/, '')
   end
 
 end
