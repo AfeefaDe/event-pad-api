@@ -7,7 +7,7 @@ class Event::Operation::UpdateTest < ActiveSupport::TestCase
     event = Event.last
     assert_no_difference -> { Event.count } do
       result =
-        Event::Operation::Update.(id: event.id,
+        Event::Operation::Update.(id: event.uuid,
           title: 'foo', start: Time.current + 1.hour, end: Time.current + 2.hour)
       assert result.success?
       event.reload
