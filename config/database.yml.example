@@ -1,0 +1,23 @@
+default: &default
+  adapter: mysql2
+  encoding: utf8
+  pool: 10
+  timeout: 5000
+
+development:
+  <<: *default
+  username: afeefa
+  password: ThisIsAStrongPassword123!
+  database: event-pad-api-dev
+
+test:
+  <<: *default
+  username: afeefa
+  password: ThisIsAStrongPassword123!
+  database: event-pad-api-test
+
+production:
+  <<: *default
+  username: afeefa
+  password: ThisIsAStrongPassword123!
+  database: event-pad-api-production
