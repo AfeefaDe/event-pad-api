@@ -10,7 +10,7 @@ class Participant::Operation::Create < Trailblazer::Operation
 
   def model!(options, params:)
     options['model'] = Participant.new
-    options['model'].event = Event.find_by_uri(params[:uri]) || ActiveRecord::RecordNotFound
+    options['model'].event = Event.find_by_uri(params[:uri]) || (raise ActiveRecord::RecordNotFound)
   end
 
 end

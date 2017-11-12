@@ -6,7 +6,7 @@ class Event::Operation::Show < Trailblazer::Operation
 
   def model!(options, params:)
     options['model'] =
-      Event.find_by_uri(params[:uri]) || ActiveRecord::RecordNotFound
+      Event.find_by_uri(params[:uri]) || (raise ActiveRecord::RecordNotFound)
   end
 
 end
