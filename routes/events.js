@@ -12,12 +12,12 @@ router.post('/', function (req, res) {
   })
 })
 
-router.get('/:id', function (req, res) {
+router.get('/:id', function (req, res, next) {
   models.Event.findById(req.params.id).then(event => {
     if (event) {
       res.send(event)
     } else {
-      res.status(404).send(null)
+      next()
     }
   }).catch(err => {
     res.status(500).send(err)
