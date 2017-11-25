@@ -27,3 +27,4 @@ For installation from scratch (express, sequelize)
       vapp.set('view engine', 'ejs');
     $ npm install --save sequelize sequelize-cli mysql
     $ npm start
+    $ npm run test[-(integration|unit)]
