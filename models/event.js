@@ -1,4 +1,5 @@
-'use strict';
+'use strict'
+
 module.exports = (sequelize, DataTypes) => {
   var Event = sequelize.define('Event', {
     title: DataTypes.STRING,
@@ -8,10 +9,10 @@ module.exports = (sequelize, DataTypes) => {
     uri: DataTypes.STRING
   }, {
     classMethods: {
-      associate: function(models) {
+      associate: function (models) {
         // associations can be defined here
       }
     }
-  });
-  return Event;
-};
+  })
+  return Event
+}

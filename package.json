@@ -5,7 +5,7 @@
   "scripts": {
     "start": "node ./bin/www.js",
     "lint": "eslint . --ext .js",
-    "dev": "DEBUG=event-api node ./bin/www",
+    "dev": "DEBUG=event-api nodemon ./bin/www.js --exec 'npm run lint && node'",
     "test": "npm run test-unit && npm run test-integration",
     "test-unit": "./node_modules/.bin/mocha test/unit/*.test.js",
     "test-integration": "./node_modules/.bin/mocha test/integration/*.test.js"
@@ -33,6 +33,6 @@
     "nodemon": "^1.12.1"
   },
   "nodemonConfig": {
-    "ignore": ["test/*", "docs/*"]
+    "ignore": ["docs/*"]
   }
 }
