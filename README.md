@@ -10,10 +10,14 @@ the new hot shit---seriously
 
     $ git clone https://github.com/afeefade/event-pad-api
     $ npm install
-    $ npm start
+    $ cd config && cp config.json.example config.json
+    $ npm run dev
 
+## Database migrations
+    sequelize db:migrate (defaults to development)
+    NODE_ENV=test sequelize db:migrate
 
-For installation from scratch (express, sequelize)
+## For installation from scratch (express, sequelize)
 
     # npm install -g express-generator
     $ express -v ejs -f

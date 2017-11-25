@@ -1,5 +1,5 @@
 'use strict'
 
-var db = require('../../models')
+var testHelper = require('../test_helper')
 
-after(() => setTimeout(() => db.close(), 10))
+testHelper.after(after)
