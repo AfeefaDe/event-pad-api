@@ -25,10 +25,13 @@ app.use(function (req, res, next) {
 
 // error handler
 app.use(function (err, req, res, next) {
-  res.status(err.status || 500)
+  const status = err.status || 500
+  err.status = undefined
+  res.status(status)
   res.send({
     message: err.message,
-    error: (app.get('env') === 'development') ? err : {},
+    status: status,
+    error: (app.get('env') === 'development') ? err : undefined,
     stack: (app.get('env') === 'development') ? err.stack.split('\n') : undefined
   })
 })
