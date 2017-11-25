@@ -8,14 +8,14 @@
     "test": "npm run test-unit && npm run test-integration",
     "test-unit": "./node_modules/.bin/mocha test/unit/*.test.js",
     "test-integration": "./node_modules/.bin/mocha test/integration/*.test.js"
-   },
-   "dependencies": {
+  },
+  "dependencies": {
     "body-parser": "~1.18.2",
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.9",
     "express": "~4.15.5",
     "morgan": "~1.9.0",
-    "mysql": "^2.15.0",
+    "mysql2": "^1.5.1",
     "sequelize": "^4.23.0",
     "sequelize-cli": "^3.1.0"
   },

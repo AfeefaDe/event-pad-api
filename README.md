@@ -24,7 +24,12 @@ For installation from scratch (express, sequelize)
     remove from www.js:
       // view engine setup
       app.set('views', path.join(__dirname, 'views'));
-      vapp.set('view engine', 'ejs');
-    $ npm install --save sequelize sequelize-cli mysql
+      app.set('view engine', 'ejs');
+    remove render calls from app.js
+    $ npm install --save sequelize mysql2
     $ npm start
     $ npm run test[-(integration|unit)]
+    $ npm install -g sequelize-cli
+    $ sequelize init
+    $ sequelize model:create --name Event --attributes title:string,dateStart:date,description:string,location:string,uri:string
+    $ sequelize db:migrate
