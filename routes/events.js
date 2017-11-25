@@ -8,13 +8,19 @@ router.post('/', function (req, res) {
   }).then(event => {
     res.status(201).send(event)
   }).catch(err => {
-    console.log('error', err)
+    res.status(500).send(err)
   })
 })
 
 router.get('/:id', function (req, res) {
   models.Event.findById(req.params.id).then(event => {
-    res.send(event)
+    if (event) {
+      res.send(event)
+    } else {
+      res.status(404).send(null)
+    }
+  }).catch(err => {
+    res.status(500).send(err)
   })
 })
 
