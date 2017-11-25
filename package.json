@@ -1,10 +1,11 @@
 {
   "name": "event-pad-api",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www",
-    "dev": "DEBUG=event-pad-api:server node ./bin/www"
+    "start": "node ./bin/www.js",
+    "lint": "eslint . --ext .js",
+    "dev": "DEBUG=event-pad-api:server nodemon ./bin/www.js --exec 'npm run lint && node'"
   },
   "dependencies": {
     "body-parser": "~1.18.2",
@@ -15,5 +16,18 @@
     "mysql": "^2.15.0",
     "sequelize": "^4.23.0",
     "sequelize-cli": "^3.1.0"
+  },
+  "devDependencies": {
+    "eslint": "^4.11.0",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-config-standard": "^10.2.1",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-node": "^5.2.1",
+    "eslint-plugin-promise": "^3.6.0",
+    "eslint-plugin-standard": "^3.0.1",
+    "nodemon": "^1.12.1"
+  },
+  "nodemonConfig": {
+    "ignore": ["test/*", "docs/*"]
   }
 }
