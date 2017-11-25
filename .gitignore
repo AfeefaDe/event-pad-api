@@ -1,5 +1,6 @@
 # Config
 config/config.json
+config/database.json
 
 # Logs
 logs

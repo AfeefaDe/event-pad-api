@@ -5,14 +5,16 @@
  */
 
 var app = require('../app')
-var debug = require('debug')('event-pad-api:server')
+var debug = require('debug')('event-api')
 var http = require('http')
+var path = require('path')
+var config = require(path.join(__dirname, '/../config/config.json'))
 
 /**
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '3000')
+var port = normalizePort(process.env.PORT || config.app_port)
 app.set('port', port)
 
 /**

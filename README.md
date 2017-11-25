@@ -10,7 +10,8 @@ the new hot shit---seriously
 
     $ git clone https://github.com/afeefade/event-pad-api
     $ npm install
-    $ cd config && cp config.json.example config.json
+    $ cd config && cp config.json.example config.json # app server port
+    $ cd config && cp database.json.example database.json # db config
     $ npm run dev
 
 ## Database migrations
