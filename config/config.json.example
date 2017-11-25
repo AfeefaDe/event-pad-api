@@ -1,0 +1,19 @@
+{
+  "development": {
+    "username": "[user]",
+    "password": "[password]",
+    "database": "event-pad-api-dev",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  },
+  "test": {
+    "username": "[user]",
+    "password": "[password]",
+    "database": "event-pad-api-test",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  },
+  "production": {
+    "dialect": "mysql"
+  }
+}
