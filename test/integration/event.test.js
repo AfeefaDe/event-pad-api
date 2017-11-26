@@ -5,7 +5,7 @@ var request = require('supertest')
 var testHelper = require('../test_helper')
 
 describe('event endpoint', function () {
-  it('creates event', function (done) {
+  it.only('creates event', function (done) {
     request(app)
       .post('/events')
       .send({
@@ -16,8 +16,8 @@ describe('event endpoint', function () {
       .expect(res => {
         const event = res.body
         assert.equal(event.title, 'Neues Event')
-        assert.ok(event.uri.match(/-Neues-Event/))
-        assert.isAtLeast(event.id, 1)
+        expect(event.uri).to.match(/\w{24}-Neues-Event/)
+        expect(event.id).to.be.at.least(1)
       })
       .end(done)
   })
