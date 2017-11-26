@@ -11,6 +11,7 @@ router.post('/', function (req, res, next) {
 
   models.Event.create({
     title: req.body.title,
+    dateStart: req.body.dateStart,
     location: req.body.location,
     description: req.body.description,
     uri
