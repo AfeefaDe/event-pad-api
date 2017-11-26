@@ -5,11 +5,25 @@ var controllersHelper = require('./controllers_helper')
 
 module.exports = {
   create (req, res, next) {
-    models.Task.create({
-      name: req.body.name,
-      eventId: req.params.eventId
-    }).then(task => {
-      res.status(201).send(task)
+    let tasks = null
+    if (Array.isArray(req.body)) {
+      tasks = req.body
+    } else {
+      tasks = [req.body]
+    }
+
+    const eventId = req.params.eventId
+
+    const data = tasks.map(task => {
+      return {
+        name: task.name,
+        eventId
+      }
+    })
+    models.Task.bulkCreate(data).then(() => {
+      models.Task.findAll({where: {eventId}}).then(tasks => {
+        res.status(201).send(tasks)
+      })
     }).catch(err => {
       controllersHelper.handleError(err, res, next)
     })
