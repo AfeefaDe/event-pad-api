@@ -49,6 +49,26 @@ router.get('/:id', function (req, res, next) {
     })
 })
 
+router.patch('/:id', function (req, res, next) {
+  findParticipant(req.params.id, req.params.eventId)
+    .then(participant => {
+      if (participant) {
+        models.Participant.update({
+          name: req.body.name,
+          rsvp: req.body.rsvp,
+        }).then(participant => {
+          res.send(participant)
+        }).catch(err => {
+          next(err)
+        })
+      } else {
+        next()
+      }
+    }).catch(err => {
+      next(err)
+    })
+})
+
 router.delete('/:id', function (req, res, next) {
   findParticipant(req.params.id, req.params.eventId)
     .then(participant => {
