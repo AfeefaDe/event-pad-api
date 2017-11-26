@@ -11,7 +11,8 @@
     "password": "[password]",
     "database": "event-pad-api-test",
     "host": "127.0.0.1",
-    "dialect": "mysql"
+    "dialect": "mysql",
+    "logging": false
   },
   "production": {
     "dialect": "mysql"

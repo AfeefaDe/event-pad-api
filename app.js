@@ -9,7 +9,10 @@ var participants = require('./routes/participants')
 
 var app = express()
 
-app.use(logger('dev'))
+if (app.get('env') !== 'test') {
+  app.use(logger('dev'))
+}
+
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(cookieParser())
