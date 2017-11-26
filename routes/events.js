@@ -10,6 +10,7 @@ router.post('/', function (req, res, next) {
   models.Event.create({
     title: req.body.title,
     location: req.body.location,
+    description: req.body.description,
     uri: token
   }).then(event => {
     res.status(201).send(event)
