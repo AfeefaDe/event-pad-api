@@ -21,7 +21,7 @@ describe('event endpoint', function () {
       .end(done)
   })
 
-  it('retrieves event', function (done) {
+  it('gets event', function (done) {
     testHelper.createEvent().then(newEvent => {
       request(app)
         .get(`/events/${newEvent.id}`)
@@ -34,5 +34,12 @@ describe('event endpoint', function () {
         })
         .end(done)
     })
+  })
+
+  it('returns 404 on missing event', function (done) {
+    request(app)
+      .get('/events/5')
+      .expect('Content-Type', 'application/json; charset=utf-8')
+      .expect(404, done)
   })
 })
