@@ -6,6 +6,7 @@
     "start": "node ./bin/www.js",
     "lint": "eslint . --ext .js",
     "dev": "DEBUG=event-api nodemon ./bin/www.js --exec 'npm run lint && node'",
+    "debug": "DEBUG=event-api nodemon --debug ./bin/www.js --exec 'npm run lint && node'",
     "test": "npm run test-unit && npm run test-integration",
     "test-unit": "npm run lint && ./node_modules/.bin/mocha --require ./test/globals.js test/unit/*.test.js",
     "test-integration": "npm run lint && ./node_modules/.bin/mocha --require ./test/globals.js test/integration/*.test.js"

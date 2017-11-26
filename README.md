@@ -38,3 +38,11 @@ the new hot shit---seriously
     $ sequelize init
     $ sequelize model:create --name Event --attributes title:string,dateStart:date,description:string,location:string,uri:string
     $ sequelize db:migrate
+
+## Remote Debugging (VSCODE)
+
+    On the host machine
+    $ npm run debug
+
+    On the dev machine
+    Just start debugger with the port configured that is shown by npm run debug
