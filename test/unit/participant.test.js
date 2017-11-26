@@ -29,11 +29,11 @@ describe('participant model', function () {
     })
   })
 
-  it('validation fails on too short name', done => {
-    const participant = new db.Participant({ name: 'a' })
+  it('validation fails on whitespace name', done => {
+    const participant = new db.Participant({ name: '   ' })
     testHelper.assertPromiseError(participant.validate(), done, error => {
       const errors = error.errors.map(error => error.message)
-      assert.deepEqual(errors[0], 'Validation len on name failed')
+      assert.deepEqual(errors[0], 'Validation notEmpty on name failed')
     })
   })
 })

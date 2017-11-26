@@ -29,11 +29,11 @@ describe('event model', function () {
     })
   })
 
-  it('validation fails on too short title', done => {
-    const event = new db.Event({ title: 'a' })
+  it('validation fails on whitespace title', done => {
+    const event = new db.Event({ title: '  ' })
     testHelper.assertPromiseError(event.validate(), done, error => {
       const errors = error.errors.map(error => error.message)
-      assert.deepEqual(errors[0], 'Validation len on title failed')
+      assert.deepEqual(errors[0], 'Validation notEmpty on title failed')
     })
   })
 })
