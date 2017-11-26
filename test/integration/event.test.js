@@ -16,6 +16,7 @@ describe('event endpoint', function () {
       .expect(res => {
         const event = res.body
         assert.equal(event.title, 'Neues Event')
+        assert.ok(event.uri.match(/-Neues-Event/))
         assert.isAtLeast(event.id, 1)
       })
       .end(done)

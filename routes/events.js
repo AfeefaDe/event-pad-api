@@ -2,16 +2,18 @@ var models = require('../models')
 var express = require('express')
 var router = express.Router()
 var crypto = require('crypto')
-
+var slug = require('slug')
 
 router.post('/', function (req, res, next) {
-  var token = crypto.randomBytes(32).toString('base64').replace(/\W/g, '').slice(0, 24)
+  const token = crypto.randomBytes(32).toString('base64').replace(/\W/g, '').slice(0, 24)
+  const titleSlug = slug(req.body.title)
+  const uri = `${token}-${titleSlug}`
 
   models.Event.create({
     title: req.body.title,
     location: req.body.location,
     description: req.body.description,
-    uri: token
+    uri
   }).then(event => {
     res.status(201).send(event)
   }).catch(err => {
