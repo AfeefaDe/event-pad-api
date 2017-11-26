@@ -29,6 +29,23 @@ module.exports = {
     })
   },
 
+  createTask (eventId) {
+    if (eventId) {
+      return this.createTaskWithEventId(eventId)
+    } else {
+      return this.createEvent().then(newEvent => {
+        return this.createTaskWithEventId(newEvent.id)
+      })
+    }
+  },
+
+  createTaskWithEventId (eventId) {
+    return db.Task.create({
+      name: 'Neuer Task',
+      eventId: eventId
+    })
+  },
+
   assertPromiseError (promise, done, errorCallback) {
     promise.then(result => {
       done(new Error('Promise should not succeed with result: ' + result))
@@ -42,6 +59,10 @@ module.exports = {
     after(() => setTimeout(() => {
       Promise.all([
         db.Participant.destroy({
+          where: {},
+          truncate: true
+        }),
+        db.Task.destroy({
           where: {},
           truncate: true
         }),

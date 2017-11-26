@@ -1,0 +1,91 @@
+'use strict'
+
+var models = require('../models')
+var controllersHelper = require('./controllers_helper')
+
+module.exports = {
+  create (req, res, next) {
+    models.Task.create({
+      name: req.body.name,
+      eventId: req.params.eventId
+    }).then(task => {
+      res.status(201).send(task)
+    }).catch(err => {
+      controllersHelper.handleError(err, res, next)
+    })
+  },
+
+  index (req, res, next) {
+    Promise.all([
+      models.Event.findById(req.params.eventId),
+      models.Task.findAll({
+        where: {
+          eventId: req.params.eventId
+        }
+      })
+    ]).then(values => {
+      const event = values[0]
+      const tasks = values[1]
+      if (event && tasks) {
+        res.send(tasks)
+      } else {
+        next()
+      }
+    }).catch(err => {
+      next(err)
+    })
+  },
+
+  show (req, res, next) {
+    findTask(req.params.id, req.params.eventId)
+      .then(task => {
+        if (task) {
+          res.send(task)
+        } else {
+          next()
+        }
+      }).catch(err => {
+        next(err)
+      })
+  },
+
+  update (req, res, next) {
+    findTask(req.params.id, req.params.eventId)
+      .then(task => {
+        if (task) {
+          task.update({
+            name: req.body.name,
+            rsvp: req.body.rsvp
+          }).then(task => {
+            res.send(task)
+          }).catch(err => {
+            controllersHelper.handleError(err, res, next)
+          })
+        } else {
+          next()
+        }
+      }).catch(err => {
+        next(err)
+      })
+  },
+
+  delete (req, res, next) {
+    findTask(req.params.id, req.params.eventId)
+      .then(task => {
+        task.destroy().then(destroyed => {
+          res.status(204).json('')
+        }).catch(err => {
+          next(err)
+        })
+      })
+  }
+}
+
+function findTask (id, eventId) {
+  return models.Task.findOne({
+    where: {
+      id: id,
+      eventId: eventId
+    }
+  })
+}
