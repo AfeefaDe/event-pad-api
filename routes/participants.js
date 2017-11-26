@@ -15,6 +15,27 @@ router.post('/', function (req, res, next) {
   })
 })
 
+router.get('/', function (req, res, next) {
+  Promise.all([
+    models.Event.findById(req.params.eventId),
+    models.Participant.findAll({
+      where: {
+        eventId: req.params.eventId
+      }
+    })
+  ]).then(values => {
+    const event = values[0]
+    const participants = values[1]
+    if (event && participants) {
+      res.send(participants)
+    } else {
+      next()
+    }
+  }).catch(err => {
+    next(err)
+  })
+})
+
 router.get('/:id', function (req, res, next) {
   models.Participant.findOne({
     where: {

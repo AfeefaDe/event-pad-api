@@ -15,7 +15,7 @@ describe('event endpoint', function () {
       .expect(201)
       .expect(res => {
         const event = res.body
-        assert(event.title, 'Neues Event')
+        assert.equal(event.title, 'Neues Event')
         assert.isAtLeast(event.id, 1)
       })
       .end(done)
@@ -29,7 +29,7 @@ describe('event endpoint', function () {
         .expect(200)
         .expect(res => {
           const event = res.body
-          assert(event.title, newEvent.title)
+          assert.equal(event.title, newEvent.title)
           assert.isAtLeast(event.id, newEvent.id)
         })
         .end(done)
@@ -38,7 +38,7 @@ describe('event endpoint', function () {
 
   it('returns 404 on missing event', function (done) {
     request(app)
-      .get('/events/5')
+      .get('/events/999')
       .expect('Content-Type', 'application/json; charset=utf-8')
       .expect(404, done)
   })
