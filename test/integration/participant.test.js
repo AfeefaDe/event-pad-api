@@ -40,6 +40,21 @@ describe('participant endpoint', function () {
     })
   })
 
+  it('deletes participant of event', function (done) {
+    testHelper.createParticipant().then(newParticipant => {
+      request(app)
+        .delete(`/events/${newParticipant.eventId}/participants/${newParticipant.id}`)
+        // HTTP status 204 has no content type header
+        // .expect('Content-Type', 'application/json; charset=utf-8')
+        .expect(204)
+        .expect(res => {
+          // TODO: Why can we not get an empty response like ''?
+          // assert.equal(res.body, '')
+        })
+       .end(done)
+    })
+  })
+
   it('retrieves all participants of event', function (done) {
     testHelper.createEvent().then(newEvent => {
       Promise.all([

@@ -42,15 +42,32 @@ router.get('/:id', function (req, res, next) {
       id: req.params.id,
       eventId: req.params.eventId
     }
-  }).then(participant => {
-    if (participant) {
-      res.send(participant)
-    } else {
-      next()
-    }
-  }).catch(err => {
-    next(err)
   })
+    .then(participant => {
+      if (participant) {
+        res.send(participant)
+      } else {
+        next()
+      }
+    }).catch(err => {
+      next(err)
+    })
+})
+
+router.delete('/:id', function (req, res, next) {
+  models.Participant.findOne({
+    where: {
+      id: req.params.id,
+      eventId: req.params.eventId
+    }
+  })
+    .then(participant => {
+      participant.destroy().then(destroyed => {
+        res.status(204).json('')
+      }).catch(err => {
+        next(err)
+      })
+    })
 })
 
 module.exports = router
