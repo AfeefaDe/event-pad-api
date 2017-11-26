@@ -37,12 +37,7 @@ router.get('/', function (req, res, next) {
 })
 
 router.get('/:id', function (req, res, next) {
-  models.Participant.findOne({
-    where: {
-      id: req.params.id,
-      eventId: req.params.eventId
-    }
-  })
+  findParticipant(req.params.id, req.params.eventId)
     .then(participant => {
       if (participant) {
         res.send(participant)
@@ -55,12 +50,7 @@ router.get('/:id', function (req, res, next) {
 })
 
 router.delete('/:id', function (req, res, next) {
-  models.Participant.findOne({
-    where: {
-      id: req.params.id,
-      eventId: req.params.eventId
-    }
-  })
+  findParticipant(req.params.id, req.params.eventId)
     .then(participant => {
       participant.destroy().then(destroyed => {
         res.status(204).json('')
@@ -69,5 +59,14 @@ router.delete('/:id', function (req, res, next) {
       })
     })
 })
+
+function findParticipant (id, eventId) {
+  return models.Participant.findOne({
+    where: {
+      id: id,
+      eventId: eventId
+    }
+  })
+}
 
 module.exports = router
