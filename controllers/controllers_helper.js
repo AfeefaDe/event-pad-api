@@ -1,8 +1,6 @@
 'use strict'
 
 module.exports = {
-
-
   handleError (error, res, next) {
     const errors = this.checkForValidationError(error)
     if (errors.length) {
