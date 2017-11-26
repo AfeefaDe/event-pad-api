@@ -29,6 +29,15 @@ module.exports = {
     })
   },
 
+  assertPromiseError (promise, done, errorCallback) {
+    promise.then(result => {
+      done(new Error('Promise should not succeed with result: ' + result))
+    }).catch(error => {
+      errorCallback(error)
+      done()
+    })
+  },
+
   after (after) {
     after(() => setTimeout(() => {
       Promise.all([
