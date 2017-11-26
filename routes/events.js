@@ -33,4 +33,22 @@ router.get('/:id', function (req, res, next) {
   })
 })
 
+router.get('/', function (req, res, next) {
+  uri = req.query.uri
+
+  if (!uri) {
+    next()
+  }
+
+  models.Event.findOne({where: {uri}}).then(event => {
+    if (event) {
+      res.send(event)
+    } else {
+      next()
+    }
+  }).catch(err => {
+    next(err)
+  })
+})
+
 module.exports = router

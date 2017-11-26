@@ -3,9 +3,10 @@
 var db = require('../models')
 
 module.exports = {
-  createEvent () {
+  createEvent (attributes = {}) {
     return db.Event.create({
-      title: 'Neues Event'
+      title: attributes.title || 'Neues Event',
+      uri: attributes.uri || 'A1b2C3-Neues-Event'
     })
   },
 

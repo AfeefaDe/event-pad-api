@@ -5,7 +5,7 @@ var request = require('supertest')
 var testHelper = require('../test_helper')
 
 describe('event endpoint', function () {
-  it.only('creates event', function (done) {
+  it('creates event', function (done) {
     request(app)
       .post('/events')
       .send({
@@ -30,8 +30,8 @@ describe('event endpoint', function () {
         .expect(200)
         .expect(res => {
           const event = res.body
-          assert.equal(event.title, newEvent.title)
-          assert.isAtLeast(event.id, newEvent.id)
+          expect(event.title).to.equal(newEvent.title)
+          expect(event.id).to.equal(newEvent.id)
         })
         .end(done)
     })
@@ -43,4 +43,28 @@ describe('event endpoint', function () {
       .expect('Content-Type', 'application/json; charset=utf-8')
       .expect(404, done)
   })
+
+  it('gets event by uri', function (done) {
+    testHelper.createEvent({uri: 'abcde-Mein-Event'}).then(newEvent => {
+      request(app)
+        .get(`/events?uri=${newEvent.uri}`)
+        .expect('Content-Type', 'application/json; charset=utf-8')
+        .expect(200)
+        .expect(res => {
+          const event = res.body
+          expect(event.title).to.equal(newEvent.title)
+          expect(event.id).to.equal(newEvent.id)
+        })
+        .end(done)
+    })
+  })
+
+  it('returns 404 for wrong uri', function (done) {
+    request(app)
+      .get(`/events?uri=1234-Ich-Komme`)
+      .expect('Content-Type', 'application/json; charset=utf-8')
+      .expect('Content-Type', 'application/json; charset=utf-8')
+      .expect(404, done)
+  })
+
 })
