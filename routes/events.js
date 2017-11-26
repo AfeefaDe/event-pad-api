@@ -1,10 +1,16 @@
 var models = require('../models')
 var express = require('express')
 var router = express.Router()
+var crypto = require('crypto')
+
 
 router.post('/', function (req, res, next) {
+  var token = crypto.randomBytes(32).toString('base64').replace(/\W/g, '').slice(0, 24)
+
   models.Event.create({
-    title: req.body.title
+    title: req.body.title,
+    location: req.body.location,
+    uri: token
   }).then(event => {
     res.status(201).send(event)
   }).catch(err => {
