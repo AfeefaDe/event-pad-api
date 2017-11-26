@@ -54,7 +54,7 @@ router.patch('/:id', function (req, res, next) {
   findParticipant(req.params.id, req.params.eventId)
     .then(participant => {
       if (participant) {
-        models.Participant.update({
+        participant.update({
           name: req.body.name,
           rsvp: req.body.rsvp
         }).then(participant => {

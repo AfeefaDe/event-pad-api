@@ -25,6 +25,72 @@ describe('participant endpoint', function () {
     })
   })
 
+  it('handles validation errors on failing create for participant of event', function (done) {
+    testHelper.createEvent().then(newEvent => {
+      request(app)
+        .post(`/events/${newEvent.id}/participants`)
+        .send({
+          name: '',
+          email: 'test@example.com',
+          rsvp: '1'
+        })
+        .expect('Content-Type', 'application/json; charset=utf-8')
+        .expect(422)
+        .expect(res => {
+          const errors = res.body
+          assert.equal(errors.length, '2')
+          assert.equal(errors[0].attribute, 'name')
+          assert.equal(errors[0].message, 'Validation notEmpty on name failed')
+          assert.equal(errors[1].attribute, 'name')
+          assert.equal(errors[1].message, 'Validation len on name failed')
+        })
+        .end(done)
+    })
+  })
+
+  it('updates participant for event', function (done) {
+    testHelper.createParticipant().then(newParticipant => {
+      request(app)
+        .patch(`/events/${newParticipant.eventId}/participants/${newParticipant.id}`)
+        .send({
+          name: 'new name',
+          rsvp: '2'
+        })
+        .expect('Content-Type', 'application/json; charset=utf-8')
+        .expect(200)
+        .expect(res => {
+          const participant = res.body
+          assert.equal(participant.name, 'new name')
+          assert.equal(participant.rsvp, '2')
+          assert.equal(participant.id, newParticipant.id)
+          assert.equal(participant.eventId, newParticipant.eventId)
+        })
+        .end(done)
+    })
+  })
+
+  it('handles validation errors on failing update for participant of event', function (done) {
+    testHelper.createParticipant().then(newParticipant => {
+      request(app)
+        .patch(`/events/${newParticipant.eventId}/participants/${newParticipant.id}`)
+        .send({
+          name: '',
+          rsvp: '2'
+        })
+        .expect('Content-Type', 'application/json; charset=utf-8')
+        .expect(422)
+        .expect(res => {
+          const errors = res.body
+          assert.equal(errors.length, '2')
+          assert.equal(errors[0].attribute, 'name')
+          assert.equal(errors[0].message, 'Validation notEmpty on name failed')
+          assert.equal(errors[1].attribute, 'name')
+          assert.equal(errors[1].message, 'Validation len on name failed')
+        })
+        .end(done)
+    })
+  })
+
   it('retrieves single participant of event', function (done) {
     testHelper.createParticipant().then(newParticipant => {
       request(app)
@@ -44,13 +110,7 @@ describe('participant endpoint', function () {
     testHelper.createParticipant().then(newParticipant => {
       request(app)
         .delete(`/events/${newParticipant.eventId}/participants/${newParticipant.id}`)
-        // HTTP status 204 has no content type header
-        // .expect('Content-Type', 'application/json; charset=utf-8')
         .expect(204)
-        .expect(res => {
-          // TODO: Why can we not get an empty response like ''?
-          // assert.equal(res.body, '')
-        })
         .end(done)
     })
   })

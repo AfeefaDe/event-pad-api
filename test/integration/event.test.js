@@ -22,6 +22,25 @@ describe('event endpoint', function () {
       .end(done)
   })
 
+  it('handles validation errors on failing create of event', function (done) {
+    request(app)
+      .post('/events')
+      .send({
+        title: ''
+      })
+      .expect('Content-Type', 'application/json; charset=utf-8')
+      .expect(422)
+      .expect(res => {
+        const errors = res.body
+        expect(errors.length).to.equal(2)
+        expect(errors[0].attribute).to.equal('title')
+        expect(errors[0].message).to.equal('Validation notEmpty on title failed')
+        expect(errors[1].attribute).to.equal('title')
+        expect(errors[1].message).to.equal('Validation len on title failed')
+      })
+      .end(done)
+  })
+
   it('gets event', function (done) {
     testHelper.createEvent().then(newEvent => {
       request(app)
