@@ -34,7 +34,7 @@ router.get('/:id', function (req, res, next) {
 })
 
 router.get('/', function (req, res, next) {
-  uri = req.query.uri
+  const uri = req.query.uri
 
   if (!uri) {
     next()

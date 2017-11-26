@@ -66,5 +66,4 @@ describe('event endpoint', function () {
       .expect('Content-Type', 'application/json; charset=utf-8')
       .expect(404, done)
   })
-
 })

@@ -21,7 +21,7 @@ describe('event model', function () {
   })
 
   it('validation fails on too long title', done => {
-    const title = new Array(252).join('a');
+    const title = new Array(252).join('a')
     const event = new db.Event({ title: title })
     testHelper.assertPromiseError(event.validate(), done, error => {
       const errors = error.errors.map(error => error.message)

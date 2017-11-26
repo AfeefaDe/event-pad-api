@@ -21,7 +21,7 @@ describe('participant model', function () {
   })
 
   it('validation fails on too long name', done => {
-    const name = new Array(252).join('a');
+    const name = new Array(252).join('a')
     const participant = new db.Participant({ name: name })
     testHelper.assertPromiseError(participant.validate(), done, error => {
       const errors = error.errors.map(error => error.message)
