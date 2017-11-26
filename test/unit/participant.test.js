@@ -36,4 +36,12 @@ describe('participant model', function () {
       assert.deepEqual(errors[0], 'Validation notEmpty on name failed')
     })
   })
+
+  it('validation fails on invalid rsvp', done => {
+    const participant = new db.Participant({ name: 'Neue Person', rsvp: 'ungültig' })
+    testHelper.assertPromiseError(participant.validate(), done, error => {
+      const errors = error.errors.map(error => error.message)
+      assert.deepEqual(errors[0], 'Validation isIn on rsvp failed')
+    })
+  })
 })

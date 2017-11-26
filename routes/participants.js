@@ -1,6 +1,7 @@
 var models = require('../models')
 var express = require('express')
 var router = express.Router({ mergeParams: true })
+var routesHelper = require('./routes_helper')
 
 router.post('/', function (req, res, next) {
   models.Participant.create({
@@ -11,7 +12,7 @@ router.post('/', function (req, res, next) {
   }).then(participant => {
     res.status(201).send(participant)
   }).catch(err => {
-    next(err)
+    routesHelper.handleError(err, res, next)
   })
 })
 
@@ -55,11 +56,11 @@ router.patch('/:id', function (req, res, next) {
       if (participant) {
         models.Participant.update({
           name: req.body.name,
-          rsvp: req.body.rsvp,
+          rsvp: req.body.rsvp
         }).then(participant => {
           res.send(participant)
         }).catch(err => {
-          next(err)
+          routesHelper.handleError(err, res, next)
         })
       } else {
         next()

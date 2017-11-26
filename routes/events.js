@@ -1,6 +1,7 @@
 var models = require('../models')
 var express = require('express')
 var router = express.Router()
+var routesHelper = require('./routes_helper')
 var crypto = require('crypto')
 var slug = require('slug')
 
@@ -18,7 +19,7 @@ function create (req, res, next) {
   }).then(event => {
     res.status(201).send(event)
   }).catch(err => {
-    next(err)
+    routesHelper.handleError(err, res, next)
   })
 }
 

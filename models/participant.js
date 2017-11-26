@@ -11,7 +11,16 @@ module.exports = (sequelize, DataTypes) => {
       }
     },
     email: DataTypes.STRING,
-    rsvp: DataTypes.STRING,
+    rsvp: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      validate: {
+        isIn: [['0', '1', '2']]
+        // 0: i attend
+        // 1: i miss
+        // 2: i dont know
+      }
+    },
     eventId: DataTypes.INTEGER
   }, {
     classMethods: {
