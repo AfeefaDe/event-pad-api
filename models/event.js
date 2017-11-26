@@ -7,7 +7,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       validate: {
         notEmpty: true,
-        len: [1, 150]
+        len: [3, 250]
       }
     },
     dateStart: DataTypes.DATE,

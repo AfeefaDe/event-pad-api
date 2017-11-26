@@ -2,7 +2,14 @@
 
 module.exports = (sequelize, DataTypes) => {
   var Participant = sequelize.define('Participant', {
-    name: DataTypes.STRING,
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notEmpty: true,
+        len: [3, 250]
+      }
+    },
     email: DataTypes.STRING,
     rsvp: DataTypes.STRING,
     eventId: DataTypes.INTEGER
