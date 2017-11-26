@@ -46,3 +46,13 @@ the new hot shit---seriously
 
     On the dev machine
     Just start debugger with the port configured that is shown by npm run debug
+
+## API documentation
+
+    Goto: 
+    $ https://editor.swagger.io/ 
+    
+    and copy and paste the content of 
+    $ api/swagger/swagger.yaml
+    
+    into the editor and enjoy the documentation

@@ -47,6 +47,10 @@ paths:
           schema:
             # a pointer to a definition
             $ref: "#/definitions/EventResponse"
+        "422":
+          description: ValidationError
+          schema:
+            $ref: "#/definitions/ValidationErrorsResponse"
         # responses may fall through to errors
         default:
           description: Error
@@ -131,6 +135,10 @@ paths:
           schema:
             # a pointer to a definition
             $ref: "#/definitions/ParticipantResponse"
+        "422":
+          description: ValidationError
+          schema:
+            $ref: "#/definitions/ValidationErrorsResponse"
         # responses may fall through to errors
         default:
           description: Error
@@ -160,6 +168,41 @@ paths:
   /events/{eventId}/participants/{id}:
     # binds a127 app logic to a route
     x-swagger-router-controller: events
+    patch:
+      description: Updates a single participant for event
+      # used as the method name of the controller
+      operationId: updateParticipant
+      parameters:
+        - name: eventId
+          in: path
+          description: id of the event
+          required: true
+          type: integer
+        - name: name
+          in: query
+          description: name of the participant
+          required: false
+          type: string
+        - name: rsvp
+          in: query
+          description: Will the participant visit the event?
+          required: false
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/ParticipantResponse"
+        "422":
+          description: ValidationError
+          schema:
+            $ref: "#/definitions/ValidationErrorsResponse"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
     get:
       description: Returns a single participant of an event
       # used as the method name of the controller
@@ -242,12 +285,24 @@ definitions:
       updatedAt:
         type: string
   ParticipantsResponse:
+      type: array
+      items:
+        $ref: "#/definitions/ParticipantResponse"
+  ValidationErrorResponse:
     properties:
-      participants:
-        type: array
-        items:
-          $ref: "#/definitions/ParticipantResponse"
+      attribute:
+        type: string
+      message:
+        type: string
+      status:
+        type: string
+  ValidationErrorsResponse:
+      type: array
+      items:
+        $ref: "#/definitions/ValidationErrorResponse"
   ErrorResponse:
     properties:
       message:
+        type: string
+      status:
         type: string
