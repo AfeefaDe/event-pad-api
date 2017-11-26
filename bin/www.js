@@ -6,7 +6,6 @@
 
 var app = require('../app')
 var debug = require('debug')('event-api')
-var http = require('http')
 var path = require('path')
 var config = require(path.join(__dirname, '/../config/config.json'))
 
@@ -16,20 +15,6 @@ var config = require(path.join(__dirname, '/../config/config.json'))
 
 var port = normalizePort(process.env.PORT || config.app_port)
 app.set('port', port)
-
-/**
- * Create HTTP server.
- */
-
-var server = http.createServer(app)
-
-/**
- * Listen on provided port, on all network interfaces.
- */
-
-server.listen(port)
-server.on('error', onError)
-server.on('listening', onListening)
 
 /**
  * Normalize a port into a number, string, or false.
@@ -52,39 +37,25 @@ function normalizePort (val) {
 }
 
 /**
- * Event listener for HTTP server "error" event.
+ * Swagger sutff
  */
 
-function onError (error) {
-  if (error.syscall !== 'listen') {
-    throw error
-  }
+var SwaggerExpress = require('swagger-express-mw')
 
-  var bind = typeof port === 'string'
-    ? 'Pipe ' + port
-    : 'Port ' + port
-
-  // handle specific listen errors with friendly messages
-  switch (error.code) {
-    case 'EACCES':
-      console.error(bind + ' requires elevated privileges')
-      process.exit(1)
-    case 'EADDRINUSE':
-      console.error(bind + ' is already in use')
-      process.exit(1)
-    default:
-      throw error
-  }
+var swaggerConfig = {
+  appRoot: path.join(__dirname, '..') // required config
 }
 
-/**
- * Event listener for HTTP server "listening" event.
- */
+SwaggerExpress.create(swaggerConfig, function (err, swaggerExpress) {
+  if (err) { throw err }
 
-function onListening () {
-  var addr = server.address()
-  var bind = typeof addr === 'string'
-    ? 'pipe ' + addr
-    : 'port ' + addr.port
-  debug('Listening on ' + bind)
-}
+  // install middleware
+  swaggerExpress.register(app)
+
+  /**
+   * Listen on provided port, on all network interfaces.
+   */
+
+  app.listen(port)
+  debug('Listening on port ' + port)
+})

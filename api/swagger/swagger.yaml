@@ -1,0 +1,253 @@
+swagger: "2.0"
+info:
+  version: "0.0.1"
+  title: event-pad-api
+# during dev, should point to your local machine
+host: localhost:3004
+# basePath prefixes all resource paths 
+basePath: /
+# 
+schemes:
+  # tip: remove http to make production-grade
+  - http
+  - https
+# format of bodies a client can send (Content-Type)
+consumes:
+  - application/json
+# format of the responses to the client (Accepts)
+produces:
+  - application/json
+paths:
+  /events:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: events
+    post:
+      description: Creates a single event
+      # used as the method name of the controller
+      operationId: createEvent
+      parameters:
+        - name: title
+          in: query
+          description: title of the event
+          required: true
+          type: string
+        - name: dateStart
+          in: query
+          description: start date of the event
+          required: false
+          type: string
+        - name: location
+          in: query
+          description: location of the event
+          required: false
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/EventResponse"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    get:
+      description: Returns a single event by uri
+      # used as the method name of the controller
+      operationId: showByUri
+      parameters:
+        - name: uri
+          in: query
+          description: The uri of the event to get
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/EventResponse"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /events/{id}:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: events
+    get:
+      description: Returns a single event
+      # used as the method name of the controller
+      operationId: showEvent
+      parameters:
+        - name: id
+          in: path
+          description: The id of the event to get
+          required: true
+          type: integer
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/EventResponse"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /events/{eventId}/participants:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: participants
+    post:
+      description: Creates a single participant for event
+      # used as the method name of the controller
+      operationId: createParticipant
+      parameters:
+        - name: eventId
+          in: path
+          description: id of the event
+          required: true
+          type: integer
+        - name: name
+          in: query
+          description: name of the participant
+          required: true
+          type: string
+        - name: email
+          in: query
+          description: mail address of the participant
+          required: false
+          type: string
+        - name: rsvp
+          in: query
+          description: Will the participant visit the event?
+          required: false
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/ParticipantResponse"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    get:
+      description: Returns a list of all participants of an event
+      # used as the method name of the controller
+      operationId: index
+      parameters:
+        - name: eventId
+          in: path
+          description: id of the event
+          required: true
+          type: integer
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/ParticipantsResponse"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /events/{eventId}/participants/{id}:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: events
+    get:
+      description: Returns a single participant of an event
+      # used as the method name of the controller
+      operationId: show
+      parameters:
+        - name: eventId
+          in: path
+          description: id of the event
+          required: true
+          type: integer
+        - name: id
+          in: path
+          description: id of the participant
+          required: true
+          type: integer
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/ParticipantResponse"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    delete:
+      description: Deletes a single participant of the event
+      # used as the method name of the controller
+      operationId: delete
+      parameters:
+        - name: eventId
+          in: path
+          description: The id of the event
+          required: true
+          type: integer
+        - name: id
+          in: path
+          description: id of the participant
+          required: true
+          type: integer
+      responses:
+        "204":
+          description: Success
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /swagger:
+    x-swagger-pipe: swagger_raw
+# complex objects have schema definitions
+definitions:
+  EventResponse:
+    properties:
+      id:
+        type: integer
+      title:
+        type: string
+      dateStart:
+        type: string
+      location:
+        type: string
+      createdAt:
+        type: string
+      updatedAt:
+        type: string
+  ParticipantResponse:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      email:
+        type: string
+      rsvp:
+        type: string
+      createdAt:
+        type: string
+      updatedAt:
+        type: string
+  ParticipantsResponse:
+    properties:
+      participants:
+        type: array
+        items:
+          $ref: "#/definitions/ParticipantResponse"
+  ErrorResponse:
+    properties:
+      message:
+        type: string
