@@ -10,6 +10,13 @@ module.exports = {
     })
   },
 
+  createTaskParticipant (taskId, participantId) {
+    return db.TaskParticipant.create({
+      taskId: taskId,
+      participantId: participantId
+    })
+  },
+
   createParticipant (eventId) {
     if (eventId) {
       return this.createParticipantWithEventId(eventId)
@@ -55,9 +62,15 @@ module.exports = {
     })
   },
 
-  after (after) {
+  after (after, closeConnection, timeout) {
+    console.log('outer')
     after(() => setTimeout(() => {
+      console.log('inner')
       Promise.all([
+        db.TaskParticipant.destroy({
+          where: {},
+          truncate: true
+        }),
         db.Participant.destroy({
           where: {},
           truncate: true
@@ -71,8 +84,10 @@ module.exports = {
           truncate: true
         })
       ]).then(() => {
-        db.sequelize.close()
+        if (closeConnection) {
+          db.sequelize.close()
+        }
       })
-    }, 10))
+    }, timeout))
   }
 }

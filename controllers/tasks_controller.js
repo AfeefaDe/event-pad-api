@@ -92,6 +92,34 @@ module.exports = {
           next(err)
         })
       })
+  },
+
+  addParticipantToTask (req, res, next) {
+    Promise.all([
+      findTask(req.params.id, req.params.eventId),
+      findParticipant(req.params.id, req.params.eventId)
+    ]).then(values => {
+      const task = values[0]
+      const worker = values[1]
+      task.setWorkers([worker]).then(associatedWorkers => {
+        res.status(204).json('')
+      }).catch(err => {
+        next(err)
+      })
+    }).catch(err => {
+      next(err)
+    })
+  },
+
+  removeParticipantFromTask (req, res, next) {
+    findTaskParticipant(req.params.id, req.params.participantId)
+      .then(taskParticpant => {
+        taskParticpant.destroy().then(destroyed => {
+          res.status(204).json('')
+        }).catch(err => {
+          next(err)
+        })
+      })
   }
 }
 
@@ -100,6 +128,24 @@ function findTask (id, eventId) {
     where: {
       id: id,
       eventId: eventId
+    }
+  })
+}
+
+function findParticipant (id, eventId) {
+  return models.Participant.findOne({
+    where: {
+      id: id,
+      eventId: eventId
+    }
+  })
+}
+
+function findTaskParticipant (taskId, participantId) {
+  return models.TaskParticipant.findOne({
+    where: {
+      taskId: taskId,
+      participantId: participantId
     }
   })
 }

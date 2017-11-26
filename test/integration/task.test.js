@@ -57,6 +57,61 @@ describe('task endpoint', function () {
     })
   })
 
+  it('associates task and worker', function (done) {
+    testHelper.createEvent().then(newEvent => {
+      Promise.all([
+        testHelper.createTask(newEvent.id),
+        testHelper.createParticipant(newEvent.id)
+      ]).then(values => {
+        const newTask = values[0]
+        const newParticipant = values[1]
+        request(app)
+          .post(`/events/${newTask.eventId}/tasks/${newTask.id}/participants`)
+          .send({ particpantId: newParticipant.id })
+          .expect(204)
+          .expect(res => {
+            newTask.reload().then(reloadedTask => {
+              reloadedTask.getWorkers().then(workers => {
+                expect(workers.length).to.equal(1)
+                expect(workers[0].to_json).to.deep.equal(newParticipant.to_json)
+              }).catch(done)
+            })
+          })
+          .end(done)
+      })
+    })
+  })
+
+  it('removes association for task and worker', function (done) {
+    testHelper.createEvent().then(newEvent => {
+      Promise.all([
+        testHelper.createTask(newEvent.id),
+        testHelper.createParticipant(newEvent.id)
+      ]).then(values => {
+        const newTask = values[0]
+        const newParticipant = values[1]
+        testHelper.createTaskParticipant(newTask.id, newParticipant.id).then(newTaskParticipant => {
+          request(app)
+            .delete(`/events/${newTask.eventId}/tasks/${newTask.id}/participants/${newParticipant.id}`)
+            .expect(204)
+            .expect(res => {
+              newTask.reload().then(reloadedTask => {
+                reloadedTask.getWorkers().then(workers => {
+                  expect(workers.length).to.equal(0)
+                })
+              })
+              newParticipant.reload().then(reloadedParticipant => {
+                reloadedParticipant.getTasks().then(tasks => {
+                  expect(tasks.length).to.equal(0)
+                })
+              })
+            })
+            .end(done)
+        })
+      })
+    })
+  })
+
   it('handles validation errors on failing update for task of event', function (done) {
     testHelper.createTask().then(newTask => {
       request(app)
