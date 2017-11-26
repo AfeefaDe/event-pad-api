@@ -10,7 +10,7 @@ module.exports = {
   },
 
   createParticipant (eventId) {
-    if(eventId) {
+    if (eventId) {
       return this.createParticipantWithEventId(eventId)
     } else {
       return this.createEvent().then(newEvent => {

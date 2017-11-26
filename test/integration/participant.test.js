@@ -12,7 +12,7 @@ describe('participant endpoint', function () {
         .send({
           name: 'Neuer Teilnehmer',
           email: 'test@example.com',
-          rsvp: '1',
+          rsvp: '1'
         })
         .expect('Content-Type', 'application/json; charset=utf-8')
         .expect(201)
@@ -21,7 +21,7 @@ describe('participant endpoint', function () {
           assert.equal(participant.name, 'Neuer Teilnehmer')
           assert.isAtLeast(participant.id, 1)
         })
-       .end(done)
+        .end(done)
     })
   })
 
@@ -51,7 +51,7 @@ describe('participant endpoint', function () {
           // TODO: Why can we not get an empty response like ''?
           // assert.equal(res.body, '')
         })
-       .end(done)
+        .end(done)
     })
   })
 
@@ -74,7 +74,7 @@ describe('participant endpoint', function () {
             assert.isAtLeast(participants[1].id, newParticipants[1].id)
           })
           .end(done)
-        })
+      })
     })
   })
 
@@ -88,10 +88,9 @@ describe('participant endpoint', function () {
   it('returns 404 on missing participant for exisiting event', function (done) {
     testHelper.createEvent().then(newEvent => {
       request(app)
-      .get('/events/999/participants')
-      .expect('Content-Type', 'application/json; charset=utf-8')
-      .expect(404, done)
+        .get('/events/999/participants')
+        .expect('Content-Type', 'application/json; charset=utf-8')
+        .expect(404, done)
     })
   })
-
 })
