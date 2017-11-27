@@ -106,7 +106,7 @@ describe('task endpoint', function () {
       testHelper.createTask(newEvent.id).then(newTask => {
         request(app)
           .post(`/events/${newTask.eventId}/tasks/${newTask.id}/participants`)
-          .send({ particpantName: 'Hannah' })
+          .send({ name: 'Hannah' })
           .expect(204)
           .expect(res => {
             newTask.reload().then(reloadedTask => {
