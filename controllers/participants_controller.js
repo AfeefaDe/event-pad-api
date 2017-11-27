@@ -23,7 +23,8 @@ module.exports = {
       models.Participant.findAll({
         where: {
           eventId: req.params.eventId
-        }
+        },
+        attributes: models.Participant.defaultAttributes
       })
     ]).then(values => {
       const event = values[0]
