@@ -21,6 +21,24 @@ describe('task endpoint', function () {
     })
   })
 
+  it('creates task list for event', function (done) {
+    testHelper.createEvent().then(newEvent => {
+      request(app)
+        .post(`/events/${newEvent.id}/tasks`)
+        .send([{ name: 'Neuer Task' }, { name: 'Neuer Task2' }])
+        .expect('Content-Type', 'application/json; charset=utf-8')
+        .expect(201)
+        .expect(res => {
+          const tasks = res.body
+          assert.equal(tasks[0].name, 'Neuer Task')
+          assert.isAtLeast(tasks[0].id, 1)
+          assert.equal(tasks[1].name, 'Neuer Task2')
+          assert.isAtLeast(tasks[1].id, 2)
+        })
+        .end(done)
+    })
+  })
+
   it('handles validation errors on failing create for task of event', function (done) {
     testHelper.createEvent().then(newEvent => {
       request(app)
@@ -57,7 +75,7 @@ describe('task endpoint', function () {
     })
   })
 
-  it('associates task and worker', function (done) {
+  it('associates task with existing worker', function (done) {
     testHelper.createEvent().then(newEvent => {
       Promise.all([
         testHelper.createTask(newEvent.id),
@@ -71,13 +89,35 @@ describe('task endpoint', function () {
           .expect(204)
           .expect(res => {
             newTask.reload().then(reloadedTask => {
-              reloadedTask.getWorkers().then(workers => {
+              return reloadedTask.getWorkers().then(workers => {
                 expect(workers.length).to.equal(1)
                 expect(workers[0].to_json).to.deep.equal(newParticipant.to_json)
-              }).catch(done)
-            })
+                done()
+              })
+            }).catch(done)
           })
-          .end(done)
+          .end(() => {})
+      })
+    })
+  })
+
+  it('associates task with new worker', function (done) {
+    testHelper.createEvent().then(newEvent => {
+      testHelper.createTask(newEvent.id).then(newTask => {
+        request(app)
+          .post(`/events/${newTask.eventId}/tasks/${newTask.id}/participants`)
+          .send({ particpantName: 'Hannah' })
+          .expect(204)
+          .expect(res => {
+            newTask.reload().then(reloadedTask => {
+              return reloadedTask.getWorkers().then(workers => {
+                expect(workers.length).to.equal(1)
+                expect(workers[0].name).to.equal('Hannah')
+                done()
+              })
+            }).catch(done)
+          })
+          .end(() => {})
       })
     })
   })

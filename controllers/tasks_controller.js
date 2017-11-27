@@ -3,27 +3,37 @@
 var models = require('../models')
 var controllersHelper = require('./controllers_helper')
 
+function createTask (eventId, task) {
+  return models.Task.create({
+    name: task.name,
+    eventId
+  })
+}
+
+function bulkCreateTasks (eventId, tasks) {
+  const data = tasks.map(task => {
+    return {
+      name: task.name,
+      eventId
+    }
+  })
+
+  return models.Task.bulkCreate(data).then(() => {
+    return models.Task.findAll({where: {eventId}})
+  })
+}
+
 module.exports = {
   create (req, res, next) {
-    let tasks = null
-    if (Array.isArray(req.body)) {
-      tasks = req.body
-    } else {
-      tasks = [req.body]
-    }
-
     const eventId = req.params.eventId
-
-    const data = tasks.map(task => {
-      return {
-        name: task.name,
-        eventId
-      }
-    })
-    models.Task.bulkCreate(data).then(() => {
-      models.Task.findAll({where: {eventId}}).then(tasks => {
-        res.status(201).send(tasks)
-      })
+    let promise
+    if (Array.isArray(req.body)) {
+      promise = bulkCreateTasks(eventId, req.body)
+    } else {
+      promise = createTask(eventId, req.body)
+    }
+    return promise.then(result => {
+      res.status(201).send(result)
     }).catch(err => {
       controllersHelper.handleError(err, res, next)
     })
@@ -95,9 +105,22 @@ module.exports = {
   },
 
   addParticipantToTask (req, res, next) {
+    const eventId = req.params.eventId
+    const taskId = req.params.id
+
+    let participantPromise
+    if (req.body.particpantId) {
+      participantPromise = findParticipant(req.body.particpantId, req.params.eventId)
+    } else {
+      participantPromise = models.Participant.create({
+        name: req.body.particpantName,
+        eventId: eventId
+      })
+    }
+
     Promise.all([
-      findTask(req.params.id, req.params.eventId),
-      findParticipant(req.params.id, req.params.eventId)
+      findTask(taskId, eventId),
+      participantPromise
     ]).then(values => {
       const task = values[0]
       const worker = values[1]

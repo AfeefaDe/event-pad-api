@@ -62,10 +62,8 @@ module.exports = {
     })
   },
 
-  after (after, closeConnection, timeout) {
-    console.log('outer')
-    after(() => setTimeout(() => {
-      console.log('inner')
+  after (after) {
+    after(done => {
       Promise.all([
         db.TaskParticipant.destroy({
           where: {},
@@ -84,10 +82,9 @@ module.exports = {
           truncate: true
         })
       ]).then(() => {
-        if (closeConnection) {
-          db.sequelize.close()
-        }
+        db.sequelize.close()
+        done()
       })
-    }, timeout))
+    })
   }
 }
