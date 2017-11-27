@@ -75,7 +75,7 @@ describe('task endpoint', function () {
     })
   })
 
-  it('associates task with existing worker', function (done) {
+  it('associates task with existing participant', function (done) {
     testHelper.createEvent().then(newEvent => {
       Promise.all([
         testHelper.createTask(newEvent.id),
@@ -89,19 +89,18 @@ describe('task endpoint', function () {
           .expect(204)
           .expect(res => {
             newTask.reload().then(reloadedTask => {
-              return reloadedTask.getWorkers().then(workers => {
-                expect(workers.length).to.equal(1)
-                expect(workers[0].to_json).to.deep.equal(newParticipant.to_json)
-                done()
+              return reloadedTask.getAssignees().then(assignees => {
+                expect(assignees.length).to.equal(1)
+                expect(assignees[0].to_json).to.deep.equal(newParticipant.to_json)
               })
-            }).catch(done)
+            })
           })
-          .end(() => {})
+          .end(done)
       })
     })
   })
 
-  it('associates task with new worker', function (done) {
+  it('associates task with new participant', function (done) {
     testHelper.createEvent().then(newEvent => {
       testHelper.createTask(newEvent.id).then(newTask => {
         request(app)
@@ -110,19 +109,18 @@ describe('task endpoint', function () {
           .expect(204)
           .expect(res => {
             newTask.reload().then(reloadedTask => {
-              return reloadedTask.getWorkers().then(workers => {
-                expect(workers.length).to.equal(1)
-                expect(workers[0].name).to.equal('Hannah')
-                done()
+              reloadedTask.getAssignees().then(assignees => {
+                expect(assignees.length).to.equal(1)
+                expect(assignees[0].name).to.equal('Hannah')
               })
-            }).catch(done)
+            })
           })
-          .end(() => {})
+          .end(done)
       })
     })
   })
 
-  it('removes association for task and worker', function (done) {
+  it('removes association for task and assignee', function (done) {
     testHelper.createEvent().then(newEvent => {
       Promise.all([
         testHelper.createTask(newEvent.id),
@@ -136,8 +134,8 @@ describe('task endpoint', function () {
             .expect(204)
             .expect(res => {
               newTask.reload().then(reloadedTask => {
-                reloadedTask.getWorkers().then(workers => {
-                  expect(workers.length).to.equal(0)
+                reloadedTask.getAssignees().then(assignees => {
+                  expect(assignees.length).to.equal(0)
                 })
               })
               newParticipant.reload().then(reloadedParticipant => {

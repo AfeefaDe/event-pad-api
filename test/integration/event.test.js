@@ -41,21 +41,6 @@ describe('event endpoint', function () {
       .end(done)
   })
 
-  it('gets event', function (done) {
-    testHelper.createEvent().then(newEvent => {
-      request(app)
-        .get(`/events/${newEvent.id}`)
-        .expect('Content-Type', 'application/json; charset=utf-8')
-        .expect(200)
-        .expect(res => {
-          const event = res.body
-          expect(event.title).to.equal(newEvent.title)
-          expect(event.id).to.equal(newEvent.id)
-        })
-        .end(done)
-    })
-  })
-
   it('returns 404 on missing event', function (done) {
     request(app)
       .get('/events/999')
@@ -63,10 +48,10 @@ describe('event endpoint', function () {
       .expect(404, done)
   })
 
-  it('gets event by uri', function (done) {
+  it('gets event', function (done) {
     testHelper.createEvent({uri: 'abcde-Mein-Event'}).then(newEvent => {
       request(app)
-        .get(`/events?uri=${newEvent.uri}`)
+        .get(`/events/${newEvent.uri}`)
         .expect('Content-Type', 'application/json; charset=utf-8')
         .expect(200)
         .expect(res => {
@@ -80,7 +65,7 @@ describe('event endpoint', function () {
 
   it('returns 404 for wrong uri', function (done) {
     request(app)
-      .get(`/events?uri=1234-Ich-Komme`)
+      .get(`/events/1234-Ich-Komme`)
       .expect('Content-Type', 'application/json; charset=utf-8')
       .expect('Content-Type', 'application/json; charset=utf-8')
       .expect(404, done)

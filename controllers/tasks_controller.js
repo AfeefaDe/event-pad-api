@@ -45,6 +45,14 @@ module.exports = {
       models.Task.findAll({
         where: {
           eventId: req.params.eventId
+        },
+        attributes: models.Task.defaultAttributes,
+        include: {
+          association: 'assignees',
+          attributes: models.TaskParticipant.defaultAttributes,
+          through: {
+            attributes: []
+          }
         }
       })
     ]).then(values => {
@@ -123,8 +131,8 @@ module.exports = {
       participantPromise
     ]).then(values => {
       const task = values[0]
-      const worker = values[1]
-      task.setWorkers([worker]).then(associatedWorkers => {
+      const assignee = values[1]
+      task.setAssignees([assignee]).then(assignee => {
         res.status(204).json('')
       }).catch(err => {
         next(err)

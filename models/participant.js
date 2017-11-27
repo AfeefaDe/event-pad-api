@@ -14,6 +14,7 @@ module.exports = (sequelize, DataTypes) => {
     rsvp: {
       type: DataTypes.STRING,
       allowNull: true,
+      default: '2',
       validate: {
         isIn: [['0', '1', '2']]
         // 0: i attend
@@ -22,17 +23,20 @@ module.exports = (sequelize, DataTypes) => {
       }
     },
     eventId: DataTypes.INTEGER
-  }, {
-    classMethods: {
-      associate: function (models) {
-        models.Participant.belongsTo(models.Event, {
-          onDelete: 'CASCADE',
-          foreignKey: {
-            allowNull: false
-          }
-        })
-      }
-    }
   })
+
+  Participant.defaultAttributes = ['id', 'name', 'rsvp']
+
+  Participant.associate = models => {
+    Participant.belongsToMany(models.Task, {
+      through: {
+        model: models.TaskParticipant,
+        unique: true
+      },
+      as: 'tasks',
+      foreignKey: 'taskId'
+    })
+  }
+
   return Participant
 }

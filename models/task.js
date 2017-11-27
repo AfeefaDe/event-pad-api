@@ -11,17 +11,20 @@ module.exports = (sequelize, DataTypes) => {
       }
     },
     eventId: DataTypes.INTEGER
-  }, {
-    classMethods: {
-      associate: function (models) {
-        models.Task.belongsTo(models.Event, {
-          onDelete: 'CASCADE',
-          foreignKey: {
-            allowNull: false
-          }
-        })
-      }
-    }
   })
+
+  Task.associate = models => {
+    Task.belongsToMany(models.Participant, {
+      through: {
+        model: models.TaskParticipant,
+        unique: true
+      },
+      as: 'assignees',
+      foreignKey: 'participantId'
+    })
+  }
+
+  Task.defaultAttributes = ['id', 'name']
+
   return Task
 }

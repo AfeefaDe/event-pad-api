@@ -29,24 +29,24 @@ Object.keys(db).forEach(modelName => {
 db.sequelize = sequelize
 
 // define associations throughs
-db.Task.belongsToMany(db.Participant, {
-  through: {
-    model: db.TaskParticipant,
-    unique: false
-  },
-  as: 'workers',
-  foreignKey: 'participantId',
-  constraints: false
-})
+// db.Task.belongsToMany(db.Participant, {
+//   through: {
+//     model: db.TaskParticipant,
+//     unique: false
+//   },
+//   as: 'workers',
+//   foreignKey: 'participantId',
+//   constraints: false
+// })
 
-db.Participant.belongsToMany(db.Task, {
-  through: {
-    model: db.TaskParticipant,
-    unique: false
-  },
-  as: 'tasks',
-  foreignKey: 'taskId',
-  constraints: false
-})
+// db.Participant.belongsToMany(db.Task, {
+//   through: {
+//     model: db.TaskParticipant,
+//     unique: false
+//   },
+//   as: 'tasks',
+//   foreignKey: 'taskId',
+//   constraints: false
+// })
 
 module.exports = db

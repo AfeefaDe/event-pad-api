@@ -7,6 +7,8 @@ var index = require('./routes/index')
 var events = require('./routes/events')
 var participants = require('./routes/participants')
 var tasks = require('./routes/tasks')
+// var router = express.Router()
+// var models = require('./models')
 
 var app = express()
 
@@ -17,6 +19,26 @@ if (app.get('env') !== 'test') {
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(cookieParser())
+
+// app.use(router)
+
+// init event
+// router.use('/events/:eventUri', function (req, res, next) {
+//   models.Event.findOne({
+//     where: {
+//       uri: req.params.eventUri
+//     }
+//   }).then(event => {
+//     if (event) {
+//       res.locals.event = event
+//       next()
+//     } else {
+//       var err = new Error('Not Found')
+//       err.status = 404
+//       next(err)
+//     }
+//   }).catch(next)
+// })
 
 app.use('/', index)
 app.use('/events', events)

@@ -14,12 +14,19 @@ module.exports = (sequelize, DataTypes) => {
     description: DataTypes.STRING,
     location: DataTypes.STRING,
     uri: DataTypes.STRING
-  }, {
-    classMethods: {
-      associate: function (models) {
-        models.Event.hasMany(models.Participant)
-      }
-    }
   })
+
+  Event.defaultAttributes = ['id', 'title', 'location', 'description', 'dateStart', 'uri']
+
+  Event.associate = models => {
+    Event.hasMany(models.Participant, {
+      as: 'participants'
+    })
+
+    Event.hasMany(models.Task, {
+      as: 'tasks'
+    })
+  }
+
   return Event
 }

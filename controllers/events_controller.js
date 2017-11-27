@@ -25,25 +25,29 @@ module.exports = {
   },
 
   show (req, res, next) {
-    models.Event.findById(req.params.id).then(event => {
-      if (event) {
-        res.send(event)
-      } else {
-        next()
-      }
-    }).catch(err => {
-      next(err)
-    })
-  },
+    const uri = req.params.uri
 
-  showByUri (req, res, next) {
-    const uri = req.query.uri
-
-    if (!uri) {
-      next()
-    }
-
-    models.Event.findOne({where: {uri}}).then(event => {
+    models.Event.findOne({
+      where: {uri},
+      attributes: models.Event.defaultAttributes,
+      include: [
+        {
+          association: 'participants',
+          attributes: models.Participant.defaultAttributes
+        },
+        {
+          association: 'tasks',
+          attributes: models.Task.defaultAttributes,
+          include: {
+            association: 'assignees',
+            attributes: models.TaskParticipant.defaultAttributes,
+            through: { // hide pivot table: https://github.com/sequelize/sequelize/issues/3664
+              attributes: []
+            }
+          }
+        }
+      ]
+    }).then(event => {
       if (event) {
         res.send(event)
       } else {
