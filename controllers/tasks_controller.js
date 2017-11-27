@@ -113,7 +113,7 @@ module.exports = {
       participantPromise = findParticipant(req.body.particpantId, req.params.eventId)
     } else {
       participantPromise = models.Participant.create({
-        name: req.body.particpantName,
+        name: req.body.name,
         eventId: eventId
       })
     }
