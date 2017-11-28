@@ -29,18 +29,14 @@ module.exports = {
 
     models.Event.findOne({
       where: {uri},
-      attributes: models.Event.defaultAttributes,
       include: [
         {
-          association: 'participants',
-          attributes: models.Participant.defaultAttributes
+          association: 'participants'
         },
         {
           association: 'tasks',
-          attributes: models.Task.defaultAttributes,
           include: {
             association: 'assignees',
-            attributes: models.TaskParticipant.defaultAttributes,
             through: { // hide pivot table: https://github.com/sequelize/sequelize/issues/3664
               attributes: []
             }

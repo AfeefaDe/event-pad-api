@@ -7,8 +7,8 @@ var index = require('./routes/index')
 var events = require('./routes/events')
 var participants = require('./routes/participants')
 var tasks = require('./routes/tasks')
-// var router = express.Router()
-// var models = require('./models')
+var router = express.Router()
+var models = require('./models')
 
 var app = express()
 
@@ -20,30 +20,30 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(cookieParser())
 
-// app.use(router)
+app.use(router)
 
 // init event
-// router.use('/events/:eventUri', function (req, res, next) {
-//   models.Event.findOne({
-//     where: {
-//       uri: req.params.eventUri
-//     }
-//   }).then(event => {
-//     if (event) {
-//       res.locals.event = event
-//       next()
-//     } else {
-//       var err = new Error('Not Found')
-//       err.status = 404
-//       next(err)
-//     }
-//   }).catch(next)
-// })
+router.use('/events/:eventUri', function (req, res, next) {
+  models.Event.findOne({
+    where: {
+      uri: req.params.eventUri
+    }
+  }).then(event => {
+    if (event) {
+      res.locals.event = event
+      next()
+    } else {
+      var err = new Error('Not Found')
+      err.status = 404
+      next(err)
+    }
+  }).catch(next)
+})
 
 app.use('/', index)
 app.use('/events', events)
-app.use('/events/:eventId/participants', participants)
-app.use('/events/:eventId/tasks', tasks)
+app.use('/events/:eventUri/participants', participants)
+app.use('/events/:eventUri/tasks', tasks)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

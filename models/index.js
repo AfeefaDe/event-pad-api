@@ -6,6 +6,7 @@ var Sequelize = require('sequelize')
 var basename = path.basename(__filename)
 var env = process.env.NODE_ENV || 'development'
 var dbConfig = require(path.join(__dirname, '/../config/database.json'))[env]
+var defaultAttributes = require('../lib/default_attributes')
 var db = {}
 
 var sequelize = new Sequelize(dbConfig.database, dbConfig.username, dbConfig.password, dbConfig)
@@ -18,6 +19,7 @@ fs
   .forEach(file => {
     var model = sequelize['import'](path.join(__dirname, file))
     db[model.name] = model
+    defaultAttributes.forceDefaultAttributes(model)
   })
 
 Object.keys(db).forEach(modelName => {
@@ -27,26 +29,5 @@ Object.keys(db).forEach(modelName => {
 })
 
 db.sequelize = sequelize
-
-// define associations throughs
-// db.Task.belongsToMany(db.Participant, {
-//   through: {
-//     model: db.TaskParticipant,
-//     unique: false
-//   },
-//   as: 'workers',
-//   foreignKey: 'participantId',
-//   constraints: false
-// })
-
-// db.Participant.belongsToMany(db.Task, {
-//   through: {
-//     model: db.TaskParticipant,
-//     unique: false
-//   },
-//   as: 'tasks',
-//   foreignKey: 'taskId',
-//   constraints: false
-// })
 
 module.exports = db

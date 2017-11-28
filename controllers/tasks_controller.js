@@ -25,7 +25,7 @@ function bulkCreateTasks (eventId, tasks) {
 
 module.exports = {
   create (req, res, next) {
-    const eventId = req.params.eventId
+    const eventId = res.locals.event.id
     let promise
     if (Array.isArray(req.body)) {
       promise = bulkCreateTasks(eventId, req.body)
@@ -40,25 +40,19 @@ module.exports = {
   },
 
   index (req, res, next) {
-    Promise.all([
-      models.Event.findById(req.params.eventId),
-      models.Task.findAll({
-        where: {
-          eventId: req.params.eventId
-        },
-        attributes: models.Task.defaultAttributes,
-        include: {
-          association: 'assignees',
-          attributes: models.TaskParticipant.defaultAttributes,
-          through: {
-            attributes: []
-          }
+    const eventId = res.locals.event.id
+    models.Task.findAll({
+      where: {
+        eventId: eventId
+      },
+      include: {
+        association: 'assignees',
+        through: {
+          attributes: []
         }
-      })
-    ]).then(values => {
-      const event = values[0]
-      const tasks = values[1]
-      if (event && tasks) {
+      }
+    }).then(tasks => {
+      if (tasks) {
         res.send(tasks)
       } else {
         next()
@@ -69,7 +63,8 @@ module.exports = {
   },
 
   show (req, res, next) {
-    findTask(req.params.id, req.params.eventId)
+    const eventId = res.locals.event.id
+    findTask(req.params.id, eventId)
       .then(task => {
         if (task) {
           res.send(task)
@@ -82,7 +77,8 @@ module.exports = {
   },
 
   update (req, res, next) {
-    findTask(req.params.id, req.params.eventId)
+    const eventId = res.locals.event.id
+    findTask(req.params.id, eventId)
       .then(task => {
         if (task) {
           task.update({
@@ -102,7 +98,8 @@ module.exports = {
   },
 
   delete (req, res, next) {
-    findTask(req.params.id, req.params.eventId)
+    const eventId = res.locals.event.id
+    findTask(req.params.id, eventId)
       .then(task => {
         task.destroy().then(destroyed => {
           res.status(204).json('')
@@ -113,12 +110,12 @@ module.exports = {
   },
 
   addAssigneeToTask (req, res, next) {
-    const eventId = req.params.eventId
+    const eventId = res.locals.event.id
     const taskId = req.params.id
 
     let participantPromise
     if (req.body.id) {
-      participantPromise = findParticipant(req.body.id, req.params.eventId)
+      participantPromise = findParticipant(req.body.id, eventId)
     } else {
       participantPromise = models.Participant.create({
         name: req.body.name,
@@ -144,7 +141,7 @@ module.exports = {
   },
 
   removeAssigneeFromTask (req, res, next) {
-    const eventId = req.params.eventId
+    const eventId = res.locals.event.id
     const taskId = req.params.id
 
     Promise.all([
@@ -182,7 +179,6 @@ function findParticipant (id, eventId) {
     where: {
       id: id,
       eventId: eventId
-    },
-    attributes: models.Participant.defaultAttributes
+    }
   })
 }

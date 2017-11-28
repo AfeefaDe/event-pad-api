@@ -5,11 +5,12 @@ var controllersHelper = require('./controllers_helper')
 
 module.exports = {
   create (req, res, next) {
+    const event = res.locals.event
     models.Participant.create({
       name: req.body.name,
       email: req.body.email,
       rsvp: req.body.rsvp,
-      eventId: req.params.eventId
+      eventId: event.id
     }).then(participant => {
       res.status(201).send(participant)
     }).catch(err => {
@@ -18,29 +19,17 @@ module.exports = {
   },
 
   index (req, res, next) {
-    Promise.all([
-      models.Event.findById(req.params.eventId),
-      models.Participant.findAll({
-        where: {
-          eventId: req.params.eventId
-        },
-        attributes: models.Participant.defaultAttributes
-      })
-    ]).then(values => {
-      const event = values[0]
-      const participants = values[1]
-      if (event && participants) {
-        res.send(participants)
-      } else {
-        next()
-      }
+    const event = res.locals.event
+    event.getParticipants().then(participants => {
+      res.send(participants)
     }).catch(err => {
       next(err)
     })
   },
 
   show (req, res, next) {
-    findParticipant(req.params.id, req.params.eventId)
+    const event = res.locals.event
+    findParticipant(req.params.id, event.id)
       .then(participant => {
         if (participant) {
           res.send(participant)
@@ -53,7 +42,8 @@ module.exports = {
   },
 
   update (req, res, next) {
-    findParticipant(req.params.id, req.params.eventId)
+    const event = res.locals.event
+    findParticipant(req.params.id, event.id)
       .then(participant => {
         if (participant) {
           participant.update({
@@ -73,7 +63,8 @@ module.exports = {
   },
 
   delete (req, res, next) {
-    findParticipant(req.params.id, req.params.eventId)
+    const event = res.locals.event
+    findParticipant(req.params.id, event.id)
       .then(participant => {
         participant.destroy().then(destroyed => {
           res.status(204).json('')

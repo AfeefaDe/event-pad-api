@@ -36,6 +36,10 @@ module.exports = (sequelize, DataTypes) => {
       as: 'tasks',
       foreignKey: 'participantId'
     })
+
+    Participant.belongsTo(models.Event, {
+      as: 'event'
+    })
   }
 
   return Participant

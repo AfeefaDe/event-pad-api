@@ -1,12 +1,24 @@
 'use strict'
 
 var db = require('../models')
+var crypto = require('crypto')
+var slug = require('slug')
 
 module.exports = {
   createEvent (attributes = {}) {
+    if (!attributes.title) {
+      attributes.title = 'Neues Event'
+    }
+
+    if (!attributes.uri) {
+      const token = crypto.randomBytes(32).toString('base64').replace(/\W/g, '').slice(0, 24)
+      const titleSlug = slug(attributes.title)
+      attributes.uri = `${token}-${titleSlug}`
+    }
+
     return db.Event.create({
-      title: attributes.title || 'Neues Event',
-      uri: attributes.uri || 'A1b2C3-Neues-Event'
+      title: attributes.title,
+      uri: attributes.uri || crypto.randomBytes(32).toString('base64').replace(/\W/g, '').slice(0, 24) + '-Neues-Event'
     })
   },
 
@@ -33,6 +45,10 @@ module.exports = {
       email: 'test@example.com',
       rsvp: '1',
       eventId: eventId
+    }).then(participant => {
+      return db.Participant.findById(participant.id, {
+        include: 'event'
+      })
     })
   },
 
@@ -50,6 +66,10 @@ module.exports = {
     return db.Task.create({
       name: 'Neuer Task',
       eventId: eventId
+    }).then(task => {
+      return db.Task.findById(task.id, {
+        include: 'event'
+      })
     })
   },
 

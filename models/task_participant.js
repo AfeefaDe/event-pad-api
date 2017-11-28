@@ -6,7 +6,5 @@ module.exports = (sequelize, DataTypes) => {
     participantId: DataTypes.INTEGER
   })
 
-  TaskParticipant.defaultAttributes = ['id', 'name']
-
   return TaskParticipant
 }

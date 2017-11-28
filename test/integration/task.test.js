@@ -8,7 +8,7 @@ describe('task endpoint', function () {
   it('creates task for event', function (done) {
     testHelper.createEvent().then(newEvent => {
       request(app)
-        .post(`/events/${newEvent.id}/tasks`)
+        .post(`/events/${newEvent.uri}/tasks`)
         .send({ name: 'Neuer Task' })
         .expect('Content-Type', 'application/json; charset=utf-8')
         .expect(201)
@@ -24,7 +24,7 @@ describe('task endpoint', function () {
   it('creates task list for event', function (done) {
     testHelper.createEvent().then(newEvent => {
       request(app)
-        .post(`/events/${newEvent.id}/tasks`)
+        .post(`/events/${newEvent.uri}/tasks`)
         .send([{ name: 'Neuer Task' }, { name: 'Neuer Task2' }])
         .expect('Content-Type', 'application/json; charset=utf-8')
         .expect(201)
@@ -42,7 +42,7 @@ describe('task endpoint', function () {
   it('handles validation errors on failing create for task of event', function (done) {
     testHelper.createEvent().then(newEvent => {
       request(app)
-        .post(`/events/${newEvent.id}/tasks`)
+        .post(`/events/${newEvent.uri}/tasks`)
         .send({ name: '' })
         .expect('Content-Type', 'application/json; charset=utf-8')
         .expect(422)
@@ -61,7 +61,7 @@ describe('task endpoint', function () {
   it('updates task for event', function (done) {
     testHelper.createTask().then(newTask => {
       request(app)
-        .patch(`/events/${newTask.eventId}/tasks/${newTask.id}`)
+        .patch(`/events/${newTask.event.uri}/tasks/${newTask.id}`)
         .send({ name: 'new name' })
         .expect('Content-Type', 'application/json; charset=utf-8')
         .expect(200)
@@ -69,7 +69,6 @@ describe('task endpoint', function () {
           const task = res.body
           assert.equal(task.name, 'new name')
           assert.equal(task.id, newTask.id)
-          assert.equal(task.eventId, newTask.eventId)
         })
         .end(done)
     })
@@ -84,7 +83,7 @@ describe('task endpoint', function () {
         const newTask = values[0]
         const newParticipant = values[1]
         request(app)
-          .post(`/events/${newTask.eventId}/tasks/${newTask.id}/participants`)
+          .post(`/events/${newTask.event.uri}/tasks/${newTask.id}/participants`)
           .send({ id: newParticipant.id })
           .expect(201)
           .expect(res => {
@@ -102,7 +101,7 @@ describe('task endpoint', function () {
     testHelper.createEvent().then(newEvent => {
       testHelper.createTask(newEvent.id).then(newTask => {
         request(app)
-          .post(`/events/${newTask.eventId}/tasks/${newTask.id}/participants`)
+          .post(`/events/${newTask.event.uri}/tasks/${newTask.id}/participants`)
           .send({ name: 'Hannah' })
           .expect(201)
           .expect(res => {
@@ -126,7 +125,7 @@ describe('task endpoint', function () {
         const newParticipant = values[1]
         testHelper.createTaskParticipant(newTask.id, newParticipant.id).then(newTaskParticipant => {
           request(app)
-            .delete(`/events/${newTask.eventId}/tasks/${newTask.id}/participants/${newParticipant.id}`)
+            .delete(`/events/${newTask.event.uri}/tasks/${newTask.id}/participants/${newParticipant.id}`)
             .expect(204)
             .expect(res => {
               newTask.reload().then(reloadedTask => {
@@ -149,7 +148,7 @@ describe('task endpoint', function () {
   it('handles validation errors on failing update for task of event', function (done) {
     testHelper.createTask().then(newTask => {
       request(app)
-        .patch(`/events/${newTask.eventId}/tasks/${newTask.id}`)
+        .patch(`/events/${newTask.event.uri}/tasks/${newTask.id}`)
         .send({ name: '' })
         .expect('Content-Type', 'application/json; charset=utf-8')
         .expect(422)
@@ -168,7 +167,7 @@ describe('task endpoint', function () {
   it('retrieves single task of event', function (done) {
     testHelper.createTask().then(newTask => {
       request(app)
-        .get(`/events/${newTask.eventId}/tasks/${newTask.id}`)
+        .get(`/events/${newTask.event.uri}/tasks/${newTask.id}`)
         .expect('Content-Type', 'application/json; charset=utf-8')
         .expect(200)
         .expect(res => {
@@ -183,7 +182,7 @@ describe('task endpoint', function () {
   it('deletes task of event', function (done) {
     testHelper.createTask().then(newTask => {
       request(app)
-        .delete(`/events/${newTask.eventId}/tasks/${newTask.id}`)
+        .delete(`/events/${newTask.event.uri}/tasks/${newTask.id}`)
         .expect(204)
         .end(done)
     })
@@ -196,7 +195,7 @@ describe('task endpoint', function () {
         testHelper.createTask(newEvent.id)
       ]).then(newTasks => {
         request(app)
-          .get(`/events/${newTasks[0].eventId}/tasks`)
+          .get(`/events/${newTasks[0].event.uri}/tasks`)
           .expect('Content-Type', 'application/json; charset=utf-8')
           .expect(200)
           .expect(res => {

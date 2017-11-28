@@ -8,7 +8,7 @@ describe('participant endpoint', function () {
   it('creates participant for event', function (done) {
     testHelper.createEvent().then(newEvent => {
       request(app)
-        .post(`/events/${newEvent.id}/participants`)
+        .post(`/events/${newEvent.uri}/participants`)
         .send({
           name: 'Neuer Teilnehmer',
           email: 'test@example.com',
@@ -28,7 +28,7 @@ describe('participant endpoint', function () {
   it('handles validation errors on failing create for participant of event', function (done) {
     testHelper.createEvent().then(newEvent => {
       request(app)
-        .post(`/events/${newEvent.id}/participants`)
+        .post(`/events/${newEvent.uri}/participants`)
         .send({
           name: '',
           email: 'test@example.com',
@@ -51,7 +51,7 @@ describe('participant endpoint', function () {
   it('updates participant for event', function (done) {
     testHelper.createParticipant().then(newParticipant => {
       request(app)
-        .patch(`/events/${newParticipant.eventId}/participants/${newParticipant.id}`)
+        .patch(`/events/${newParticipant.event.uri}/participants/${newParticipant.id}`)
         .send({
           name: 'new name',
           rsvp: '2'
@@ -63,7 +63,6 @@ describe('participant endpoint', function () {
           assert.equal(participant.name, 'new name')
           assert.equal(participant.rsvp, '2')
           assert.equal(participant.id, newParticipant.id)
-          assert.equal(participant.eventId, newParticipant.eventId)
         })
         .end(done)
     })
@@ -72,7 +71,7 @@ describe('participant endpoint', function () {
   it('handles validation errors on failing update for participant of event', function (done) {
     testHelper.createParticipant().then(newParticipant => {
       request(app)
-        .patch(`/events/${newParticipant.eventId}/participants/${newParticipant.id}`)
+        .patch(`/events/${newParticipant.event.uri}/participants/${newParticipant.id}`)
         .send({
           name: '',
           rsvp: '2'
@@ -94,7 +93,7 @@ describe('participant endpoint', function () {
   it('retrieves single participant of event', function (done) {
     testHelper.createParticipant().then(newParticipant => {
       request(app)
-        .get(`/events/${newParticipant.eventId}/participants/${newParticipant.id}`)
+        .get(`/events/${newParticipant.event.uri}/participants/${newParticipant.id}`)
         .expect('Content-Type', 'application/json; charset=utf-8')
         .expect(200)
         .expect(res => {
@@ -109,7 +108,7 @@ describe('participant endpoint', function () {
   it('deletes participant of event', function (done) {
     testHelper.createParticipant().then(newParticipant => {
       request(app)
-        .delete(`/events/${newParticipant.eventId}/participants/${newParticipant.id}`)
+        .delete(`/events/${newParticipant.event.uri}/participants/${newParticipant.id}`)
         .expect(204)
         .end(done)
     })
@@ -122,7 +121,7 @@ describe('participant endpoint', function () {
         testHelper.createParticipant(newEvent.id)
       ]).then(newParticipants => {
         request(app)
-          .get(`/events/${newParticipants[0].eventId}/participants`)
+          .get(`/events/${newParticipants[0].event.uri}/participants`)
           .expect('Content-Type', 'application/json; charset=utf-8')
           .expect(200)
           .expect(res => {

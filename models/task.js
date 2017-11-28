@@ -22,6 +22,10 @@ module.exports = (sequelize, DataTypes) => {
       as: 'assignees',
       foreignKey: 'taskId'
     })
+
+    Task.belongsTo(models.Event, {
+      as: 'event'
+    })
   }
 
   Task.defaultAttributes = ['id', 'name']
