@@ -85,14 +85,12 @@ describe('task endpoint', function () {
         const newParticipant = values[1]
         request(app)
           .post(`/events/${newTask.eventId}/tasks/${newTask.id}/participants`)
-          .send({ particpantId: newParticipant.id })
-          .expect(204)
+          .send({ id: newParticipant.id })
+          .expect(201)
           .expect(res => {
-            newTask.reload().then(reloadedTask => {
-              return reloadedTask.getAssignees().then(assignees => {
-                expect(assignees.length).to.equal(1)
-                expect(assignees[0].to_json).to.deep.equal(newParticipant.to_json)
-              })
+            return newTask.getAssignees().then(assignees => {
+              expect(assignees.length).to.equal(1)
+              expect(assignees[0].to_json).to.deep.equal(newParticipant.to_json)
             })
           })
           .end(done)
@@ -106,13 +104,11 @@ describe('task endpoint', function () {
         request(app)
           .post(`/events/${newTask.eventId}/tasks/${newTask.id}/participants`)
           .send({ name: 'Hannah' })
-          .expect(204)
+          .expect(201)
           .expect(res => {
-            newTask.reload().then(reloadedTask => {
-              reloadedTask.getAssignees().then(assignees => {
-                expect(assignees.length).to.equal(1)
-                expect(assignees[0].name).to.equal('Hannah')
-              })
+            return newTask.getAssignees().then(assignees => {
+              expect(assignees.length).to.equal(1)
+              expect(assignees[0].name).to.equal('Hannah')
             })
           })
           .end(done)

@@ -8,7 +8,7 @@ router.get('/:id', tasksController.show)
 router.patch('/:id', tasksController.update)
 router.delete('/:id', tasksController.delete)
 
-router.post('/:id/participants', tasksController.addParticipantToTask)
-router.delete('/:id/participants/:participantId', tasksController.removeParticipantFromTask)
+router.post('/:id/participants', tasksController.addAssigneeToTask)
+router.delete('/:id/participants/:participantId', tasksController.removeAssigneeFromTask)
 
 module.exports = router

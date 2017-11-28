@@ -34,7 +34,7 @@ module.exports = (sequelize, DataTypes) => {
         unique: true
       },
       as: 'tasks',
-      foreignKey: 'taskId'
+      foreignKey: 'participantId'
     })
   }
 

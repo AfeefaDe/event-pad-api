@@ -112,16 +112,17 @@ module.exports = {
       })
   },
 
-  addParticipantToTask (req, res, next) {
+  addAssigneeToTask (req, res, next) {
     const eventId = req.params.eventId
     const taskId = req.params.id
 
     let participantPromise
-    if (req.body.particpantId) {
-      participantPromise = findParticipant(req.body.particpantId, req.params.eventId)
+    if (req.body.id) {
+      participantPromise = findParticipant(req.body.id, req.params.eventId)
     } else {
       participantPromise = models.Participant.create({
         name: req.body.name,
+        rsvp: req.body.rsvp,
         eventId: eventId
       })
     }
@@ -132,8 +133,8 @@ module.exports = {
     ]).then(values => {
       const task = values[0]
       const assignee = values[1]
-      task.setAssignees([assignee]).then(assignee => {
-        res.status(204).json('')
+      task.addAssignee(assignee).then(() => {
+        res.status(201).send(assignee)
       }).catch(err => {
         next(err)
       })
@@ -142,15 +143,28 @@ module.exports = {
     })
   },
 
-  removeParticipantFromTask (req, res, next) {
-    findTaskParticipant(req.params.id, req.params.participantId)
-      .then(taskParticpant => {
-        taskParticpant.destroy().then(destroyed => {
+  removeAssigneeFromTask (req, res, next) {
+    const eventId = req.params.eventId
+    const taskId = req.params.id
+
+    Promise.all([
+      findTask(taskId, eventId),
+      findParticipant(req.params.participantId, eventId)
+    ]).then(values => {
+      const task = values[0]
+      const assignee = values[1]
+      if (assignee) {
+        task.removeAssignee(assignee).then(() => {
           res.status(204).json('')
         }).catch(err => {
           next(err)
         })
-      })
+      } else {
+        next()
+      }
+    }).catch(err => {
+      next(err)
+    })
   }
 }
 
@@ -168,15 +182,7 @@ function findParticipant (id, eventId) {
     where: {
       id: id,
       eventId: eventId
-    }
-  })
-}
-
-function findTaskParticipant (taskId, participantId) {
-  return models.TaskParticipant.findOne({
-    where: {
-      taskId: taskId,
-      participantId: participantId
-    }
+    },
+    attributes: models.Participant.defaultAttributes
   })
 }
