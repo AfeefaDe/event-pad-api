@@ -30,7 +30,7 @@ module.exports = (sequelize, DataTypes) => {
   Participant.associate = models => {
     Participant.belongsToMany(models.Task, {
       through: {
-        model: models.TaskParticipant,
+        model: models.TaskAssignee,
         unique: true
       },
       as: 'tasks',
@@ -40,6 +40,19 @@ module.exports = (sequelize, DataTypes) => {
     Participant.belongsTo(models.Event, {
       as: 'event'
     })
+  }
+
+  Participant.setup = models => {
+    Participant.createFromJson = (eventId, json) => {
+      return Participant.create({
+        name: json.name,
+        email: json.email,
+        rsvp: json.rsvp,
+        eventId
+      }).then(participant => {
+        return participant.id
+      })
+    }
   }
 
   return Participant

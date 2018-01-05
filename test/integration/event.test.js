@@ -41,13 +41,6 @@ describe('event endpoint', function () {
       .end(done)
   })
 
-  it('returns 404 on missing event', function (done) {
-    request(app)
-      .get('/events/999')
-      .expect('Content-Type', 'application/json; charset=utf-8')
-      .expect(404, done)
-  })
-
   it('gets event', function (done) {
     testHelper.createEvent({uri: 'abcde-Mein-Event'}).then(newEvent => {
       request(app)
@@ -66,7 +59,6 @@ describe('event endpoint', function () {
   it('returns 404 for wrong uri', function (done) {
     request(app)
       .get(`/events/1234-Ich-Komme`)
-      .expect('Content-Type', 'application/json; charset=utf-8')
       .expect('Content-Type', 'application/json; charset=utf-8')
       .expect(404, done)
   })

@@ -1,8 +1,9 @@
 'use strict'
 
-var db = require('../models')
+var models = require('../models')
 var crypto = require('crypto')
 var slug = require('slug')
+var sequelize = models.sequelize
 
 module.exports = {
   createEvent (attributes = {}) {
@@ -16,14 +17,14 @@ module.exports = {
       attributes.uri = `${token}-${titleSlug}`
     }
 
-    return db.Event.create({
+    return models.Event.create({
       title: attributes.title,
       uri: attributes.uri || crypto.randomBytes(32).toString('base64').replace(/\W/g, '').slice(0, 24) + '-Neues-Event'
     })
   },
 
-  createTaskParticipant (taskId, participantId) {
-    return db.TaskParticipant.create({
+  createTaskAssignee (taskId, participantId) {
+    return models.TaskAssignee.create({
       taskId: taskId,
       participantId: participantId
     })
@@ -40,34 +41,75 @@ module.exports = {
   },
 
   createParticipantWithEventId (eventId) {
-    return db.Participant.create({
+    return models.Participant.create({
       name: 'Neuer Teilnehmer',
       email: 'test@example.com',
       rsvp: '1',
       eventId: eventId
     }).then(participant => {
-      return db.Participant.findById(participant.id, {
+      return models.Participant.findById(participant.id, {
         include: 'event'
       })
     })
   },
 
-  createTask (eventId) {
-    if (eventId) {
-      return this.createTaskWithEventId(eventId)
+  createTask (checklistId) {
+    if (checklistId) {
+      return this.createTaskWithChecklistId(checklistId)
     } else {
-      return this.createEvent().then(newEvent => {
-        return this.createTaskWithEventId(newEvent.id)
+      return this.createChecklist().then(newChecklist => {
+        return this.createTaskWithChecklistId(newChecklist.id)
       })
     }
   },
 
-  createTaskWithEventId (eventId) {
-    return db.Task.create({
-      name: 'Neuer Task',
-      eventId: eventId
+  createTaskWithChecklistId (checklistId) {
+    return models.Task.create({
+      checklistId,
+      name: 'Neuer Task'
     }).then(task => {
-      return db.Task.findById(task.id, {
+      return models.Task.findById(task.id, {
+        include: {
+          association: 'checklist',
+          include: 'event'
+        }
+      })
+    })
+  },
+
+  createChecklist (eventId) {
+    if (eventId) {
+      return this.createChecklistWithEventId(eventId)
+    } else {
+      return this.createEvent().then(newEvent => {
+        return this.createChecklistWithEventId(newEvent.id)
+      })
+    }
+  },
+
+  createChecklistWithTasks (eventId) {
+    let promise
+    if (eventId) {
+      promise = this.createChecklistWithEventId(eventId)
+    } else {
+      promise = this.createEvent().then(newEvent => {
+        return this.createChecklistWithEventId(newEvent.id)
+      })
+    }
+    return promise.then(newChecklist => {
+      return this.createTaskWithChecklistId(newChecklist.id).then(() => {
+        return this.createTaskWithChecklistId(newChecklist.id).then(() => {
+          return newChecklist
+        })
+      })
+    })
+  },
+
+  createChecklistWithEventId (eventId) {
+    return models.Checklist.createFromJson(eventId, {
+      title: 'Neue Checklist'
+    }).then(id => {
+      return models.Checklist.findById(id, {
         include: 'event'
       })
     })
@@ -82,27 +124,34 @@ module.exports = {
     })
   },
 
+  truncateTables (models) {
+    return sequelize.transaction(t => {
+      return sequelize.query('SET FOREIGN_KEY_CHECKS = 0', {transaction: t})
+        .then(() => {
+          const promises = []
+          models.forEach(model => {
+            promises.push(model.destroy({
+              truncate: true, transaction: t
+            }))
+          })
+          return Promise.all(promises)
+        })
+        .then(() => {
+          return sequelize.query('SET FOREIGN_KEY_CHECKS = 1', {transaction: t})
+        })
+    })
+  },
+
   after (after) {
     after(done => {
-      Promise.all([
-        db.TaskParticipant.destroy({
-          where: {},
-          truncate: true
-        }),
-        db.Participant.destroy({
-          where: {},
-          truncate: true
-        }),
-        db.Task.destroy({
-          where: {},
-          truncate: true
-        }),
-        db.Event.destroy({
-          where: {},
-          truncate: true
-        })
+      this.truncateTables([
+        models.TaskAssignee,
+        models.Participant,
+        models.Task,
+        models.Checklist,
+        models.Event
       ]).then(() => {
-        db.sequelize.close()
+        models.sequelize.close()
         done()
       })
     })

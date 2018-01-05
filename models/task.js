@@ -10,25 +10,67 @@ module.exports = (sequelize, DataTypes) => {
         len: [1, 250]
       }
     },
-    eventId: DataTypes.INTEGER
+    checked: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+      validate: {
+        isIn: [[true, false]]
+      }
+    }
   })
+
+  Task.defaultAttributes = ['id', 'name', 'checked']
 
   Task.associate = models => {
     Task.belongsToMany(models.Participant, {
       through: {
-        model: models.TaskParticipant,
+        model: models.TaskAssignee,
         unique: true
       },
       as: 'assignees',
       foreignKey: 'taskId'
     })
 
-    Task.belongsTo(models.Event, {
-      as: 'event'
+    Task.belongsTo(models.Checklist, {
+      as: 'checklist'
     })
   }
 
-  Task.defaultAttributes = ['id', 'name']
+  Task.setup = models => {
+    Task.getDefaultIncludes = () => {
+      return {
+        association: 'assignees',
+        through: { // hide pivot table: https://github.com/sequelize/sequelize/issues/3664
+          attributes: []
+        }
+      }
+    }
+
+    Task.createFromJson = (checklistId, json) => {
+      return Task.create({
+        checklistId,
+        name: json.name,
+        checked: json.checked
+      }).then(task => task.id)
+    }
+
+    Task.bulkCreateFromJson = (checklistId, listJson) => {
+      let ids = []
+      let chain = Promise.resolve()
+      listJson.forEach((json, index) => {
+        chain = chain.then(() => {
+          return Task.createFromJson(checklistId, json).then(id => {
+            ids.push(id)
+          })
+        })
+      })
+      chain = chain.then(() => {
+        return ids
+      })
+      return chain
+    }
+  }
 
   return Task
 }

@@ -3,36 +3,30 @@
 var models = require('../models')
 var controllersHelper = require('./controllers_helper')
 
-function createTask (eventId, task) {
-  return models.Task.create({
-    name: task.name,
-    eventId
-  })
-}
-
-function bulkCreateTasks (eventId, tasks) {
-  const data = tasks.map(task => {
-    return {
-      name: task.name,
-      eventId
-    }
-  })
-
-  return models.Task.bulkCreate(data).then(() => {
-    return models.Task.findAll({where: {eventId}})
-  })
-}
+const Op = models.sequelize.Op
 
 module.exports = {
   create (req, res, next) {
-    const eventId = res.locals.event.id
+    const checklistId = req.checklist.id
     let promise
+    // bulk create
     if (Array.isArray(req.body)) {
-      promise = bulkCreateTasks(eventId, req.body)
+      promise = models.Task.bulkCreateFromJson(checklistId, req.body).then(ids => {
+        return models.Task.findAll({
+          where: {
+            id: {
+              [Op.in]: ids
+            }
+          }
+        })
+      })
+    // single create
     } else {
-      promise = createTask(eventId, req.body)
+      promise = models.Task.createFromJson(checklistId, req.body).then(id => {
+        return models.Task.findById(id)
+      })
     }
-    return promise.then(result => {
+    promise.then(result => {
       res.status(201).send(result)
     }).catch(err => {
       controllersHelper.handleError(err, res, next)
@@ -40,10 +34,10 @@ module.exports = {
   },
 
   index (req, res, next) {
-    const eventId = res.locals.event.id
+    const checklistId = req.checklist.id
     models.Task.findAll({
       where: {
-        eventId: eventId
+        checklistId
       },
       include: {
         association: 'assignees',
@@ -63,74 +57,42 @@ module.exports = {
   },
 
   show (req, res, next) {
-    const eventId = res.locals.event.id
-    findTask(req.params.id, eventId)
-      .then(task => {
-        if (task) {
-          res.send(task)
-        } else {
-          next()
-        }
-      }).catch(err => {
-        next(err)
-      })
+    res.send(req.task)
   },
 
   update (req, res, next) {
-    const eventId = res.locals.event.id
-    findTask(req.params.id, eventId)
-      .then(task => {
-        if (task) {
-          task.update({
-            name: req.body.name,
-            rsvp: req.body.rsvp
-          }).then(task => {
-            res.send(task)
-          }).catch(err => {
-            controllersHelper.handleError(err, res, next)
-          })
-        } else {
-          next()
-        }
-      }).catch(err => {
-        next(err)
-      })
+    req.task.update({
+      name: req.body.name,
+      checked: req.body.checked
+    }).then(task => {
+      res.send(task)
+    }).catch(err => {
+      controllersHelper.handleError(err, res, next)
+    })
   },
 
   delete (req, res, next) {
-    const eventId = res.locals.event.id
-    findTask(req.params.id, eventId)
-      .then(task => {
-        task.destroy().then(destroyed => {
-          res.status(204).json('')
-        }).catch(err => {
-          next(err)
-        })
-      })
+    return req.task.destroy().then(destroyed => {
+      res.status(204).json('')
+    }).catch(err => {
+      next(err)
+    })
   },
 
   addAssigneeToTask (req, res, next) {
-    const eventId = res.locals.event.id
-    const taskId = req.params.id
-
     let participantPromise
     if (req.body.id) {
-      participantPromise = findParticipant(req.body.id, eventId)
+      participantPromise = findParticipant(req.body.id, req.event.id)
     } else {
       participantPromise = models.Participant.create({
         name: req.body.name,
         rsvp: req.body.rsvp,
-        eventId: eventId
+        eventId: req.event.id
       })
     }
 
-    Promise.all([
-      findTask(taskId, eventId),
-      participantPromise
-    ]).then(values => {
-      const task = values[0]
-      const assignee = values[1]
-      task.addAssignee(assignee).then(() => {
+    participantPromise.then(assignee => {
+      req.task.addAssignee(assignee).then(() => {
         res.status(201).send(assignee)
       }).catch(err => {
         next(err)
@@ -141,17 +103,9 @@ module.exports = {
   },
 
   removeAssigneeFromTask (req, res, next) {
-    const eventId = res.locals.event.id
-    const taskId = req.params.id
-
-    Promise.all([
-      findTask(taskId, eventId),
-      findParticipant(req.params.participantId, eventId)
-    ]).then(values => {
-      const task = values[0]
-      const assignee = values[1]
+    findParticipant(req.params.assigneeId, req.event.id).then(assignee => {
       if (assignee) {
-        task.removeAssignee(assignee).then(() => {
+        req.task.removeAssignee(assignee).then(() => {
           res.status(204).json('')
         }).catch(err => {
           next(err)
@@ -163,15 +117,6 @@ module.exports = {
       next(err)
     })
   }
-}
-
-function findTask (id, eventId) {
-  return models.Task.findOne({
-    where: {
-      id: id,
-      eventId: eventId
-    }
-  })
 }
 
 function findParticipant (id, eventId) {
