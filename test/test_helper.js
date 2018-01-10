@@ -124,12 +124,12 @@ module.exports = {
     })
   },
 
-  truncateTables (models) {
+  truncateTables (modelsToTruncate) {
     return sequelize.transaction(t => {
       return sequelize.query('SET FOREIGN_KEY_CHECKS = 0', {transaction: t})
         .then(() => {
           const promises = []
-          models.forEach(model => {
+          modelsToTruncate.forEach(model => {
             promises.push(model.destroy({
               truncate: true, transaction: t
             }))
